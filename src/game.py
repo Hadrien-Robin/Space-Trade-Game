@@ -20,7 +20,9 @@ class Game:
     def __init__(self):
         pg.init()
         if FULLSCREEN == True :
-            self.screen = pg.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT),pg.RESIZABLE) #fullscreen
+            Info = pg.display.Info()
+            SCREEN_WIDTH,SCREEN_HEIGHT = Info.current_w, Info.current_h
+            self.screen = pg.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT),pg.FULLSCREEN) #fullscreen
         else:
             self.screen = pg.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
 
@@ -104,11 +106,7 @@ class Game:
             if event.type == pg.QUIT:
                 self.quit()
             self.input.handle_event(event)
-            if event.type == pg.VIDEORESIZE:
-                old_surface_saved = self.screen
-                w, h = pg.display.get_surface().get_size()
-                self.screen.blit(old_surface_saved, (0,0))
-                self.screen = pg.display.set_mode((event.w, event.h), pg.RESIZABLE)
+
     def update(self):
         """
         Update the game (update the current state)

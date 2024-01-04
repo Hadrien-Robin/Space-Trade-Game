@@ -80,20 +80,39 @@ class Intro(State):
         # center text on screen
         # add the text to the all_sprites group
         title = TextSprite(self.game, os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                GAME_TITLE, 24, color = WHITE)
+                GAME_TITLE, 48, color = WHITE)
         title.rect.center = self.game.screen.get_rect().center
+        title.rect.centery = SCREEN_HEIGHT*0.2
         self.all_sprites.add(title)
 
         
         # add some more text
-        any_key_text = TextSprite(self.game,
+        new_game_text = TextSprite(self.game,
                 os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                "Press any key to switch to Outro", 12, color = (255,255,255))
-        any_key_text.rect.center = self.game.screen.get_rect().center
-        any_key_text.rect.top = title.rect.bottom + 10
+                "New Game", 24, color = (255,255,255))
+        new_game_text.rect.center = title.rect.center
+        new_game_text.rect.centery += SCREEN_HEIGHT*0.2
         # add the text to the all_sprites group
-        self.all_sprites.add(any_key_text)
+        self.all_sprites.add(new_game_text)
 
+        # add some more text
+        load_text = TextSprite(self.game,
+                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                "Load Game", 24, color = (255,255,255))
+        load_text.rect.center = title.rect.center
+        load_text.rect.centery += SCREEN_HEIGHT*0.4
+        # add the text to the all_sprites group
+        self.all_sprites.add(load_text)
+
+        # add some more text
+        settings_text = TextSprite(self.game,
+                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                "Settings", 24, color = (255,255,255))
+        settings_text.rect.center = title.rect.center
+        settings_text.rect.centery += SCREEN_HEIGHT*0.6
+        # add the text to the all_sprites group
+        self.all_sprites.add(settings_text)
+        
     def enter(self):
         # when the state becomes the current state, play the intro sound
         self.game.audio.play('intro')
@@ -106,14 +125,18 @@ class Intro(State):
                 print("Mouse press")
                 mouse_x, mouse_y = pg.mouse.get_pos()
                 # Check if the mouse click is within the region of Option 1
-                if 0.25 * window_height < mouse_y < 0.35 * window_height:
-                    launch_game()
+                if 0.35 * SCREEN_HEIGHT < mouse_y < 0.45 * SCREEN_HEIGHT:
+                    #launch_game()
+                    print("New Game")
+                    print(SCREEN_WIDTH)
                 # Check for Option 2
-                elif 0.35 * window_height < mouse_y < 0.45 * window_height:
-                    load_menu()
+                elif 0.55 * SCREEN_HEIGHT < mouse_y < 0.65 * SCREEN_HEIGHT:
+                    #load_menu()
+                    print("Load")
                 # Check for Option 3
-                elif 0.45 * window_height < mouse_y < 0.55 * window_height:
-                    self.game.change_state('Outro')
+                elif 0.75 * SCREEN_HEIGHT < mouse_y < 0.85 * SCREEN_HEIGHT:
+                    #self.game.change_state('Outro')
+                    print("Settings")
             
 
 class Outro(State):
