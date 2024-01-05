@@ -22,23 +22,26 @@ class ImageSprite(pg.sprite.Sprite):
         self.image.set_colorkey((0,0,0))
         # get the rect
         self.rect = self.image.get_rect()
+        
 
 class TextSprite(pg.sprite.Sprite):
     """
     Sprite class for displaying text
     """
-    def __init__(self, game, font_path, text="", size = 10, color = (0, 0, 0)):
+    def __init__(self, game, font_path, text="", size = 10, color = (0, 0, 0),tag=''):
         """
         game: game object
         font_path: path to the font file
         text: text to display
         size: font size
         color: font color
+        tag: a tag to identify the sprite easily
         """
         super().__init__()
         self.game = game
         self.font_path = font_path
         self.draw_text(text, size, color)
+        self.tag = tag
 
     def draw_text(self, text, size = 10, color = (0,0,0), alias = True):
         """

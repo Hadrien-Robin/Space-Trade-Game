@@ -9,9 +9,10 @@ import logging
 import pygame as pg
 from input import Input
 from audio import Audio
-from settings import *
+import settings as st
 from components import *
 import states
+from memory import Memory
 
 class Game:
     """
@@ -19,18 +20,19 @@ class Game:
     """
     def __init__(self):
         pg.init()
-        if FULLSCREEN == True :
+        if st.FULLSCREEN == True :
             Info = pg.display.Info()
-            SCREEN_WIDTH,SCREEN_HEIGHT = Info.current_w, Info.current_h
-            self.screen = pg.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT),pg.FULLSCREEN) #fullscreen
+            st.SCREEN_WIDTH,st.SCREEN_HEIGHT = Info.current_w, Info.current_h
+            self.screen = pg.display.set_mode((st.SCREEN_WIDTH,st.SCREEN_HEIGHT),pg.FULLSCREEN) #fullscreen
         else:
-            self.screen = pg.display.set_mode((SCREEN_WIDTH,SCREEN_HEIGHT))
+            self.screen = pg.display.set_mode((st.SCREEN_WIDTH,st.SCREEN_HEIGHT))
 
-        pg.display.set_caption(GAME_TITLE)
+        pg.display.set_caption(st.GAME_TITLE)
         self.clock = pg.time.Clock()
         self.input = Input()
         self.audio = Audio()
         self.init_states()
+        self.memory = Memory()
 
 
     def register_state(self, state):
@@ -83,7 +85,7 @@ class Game:
             # elapsed time in ms
             self.ms = pg.time.get_ticks()
             # elapsed time since last frame 
-            self.dt = self.clock.tick(FPS) / 1000
+            self.dt = self.clock.tick(st.FPS) / 1000
             # handle events
             self.handle_events()
             # update and draw
@@ -119,7 +121,7 @@ class Game:
         Draw the game (draw the current state)
         """
         # clear the screen
-        self.screen.fill(BACKGROUND_COLOR)
+        self.screen.fill(st.BACKGROUND_COLOR)
         # draw the current state
         if self.state:
             self.state.draw(self.screen)

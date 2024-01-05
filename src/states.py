@@ -31,6 +31,7 @@ class State:
         self.game = game
         # all sprites in the state
         self.all_sprites = pg.sprite.Group()
+        self.all_buttons = pg.sprite.Group()
         self.boot()
 
     def boot(self):
@@ -89,29 +90,32 @@ class Intro(State):
         # add some more text
         new_game_text = TextSprite(self.game,
                 os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                "New Game", 24, color = (255,255,255))
+                "New Game", 24, color = (255,255,255),tag='NewGame')
         new_game_text.rect.center = title.rect.center
         new_game_text.rect.centery += SCREEN_HEIGHT*0.2
         # add the text to the all_sprites group
         self.all_sprites.add(new_game_text)
+        self.all_buttons.add(new_game_text)
 
         # add some more text
         load_text = TextSprite(self.game,
                 os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                "Load Game", 24, color = (255,255,255))
+                "Load Game", 24, color = (255,255,255),tag='Load')
         load_text.rect.center = title.rect.center
         load_text.rect.centery += SCREEN_HEIGHT*0.4
         # add the text to the all_sprites group
         self.all_sprites.add(load_text)
+        self.all_buttons.add(load_text)
 
         # add some more text
         settings_text = TextSprite(self.game,
                 os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                "Settings", 24, color = (255,255,255))
+                "Settings", 24, color = (255,255,255),tag='Settings')
         settings_text.rect.center = title.rect.center
         settings_text.rect.centery += SCREEN_HEIGHT*0.6
         # add the text to the all_sprites group
         self.all_sprites.add(settings_text)
+        self.all_buttons.add(settings_text)
         
     def enter(self):
         # when the state becomes the current state, play the intro sound
@@ -123,21 +127,36 @@ class Intro(State):
         # check if any key is pressed
         if self.game.input.is_mouse_pressed(1):
                 print("Mouse press")
-                mouse_x, mouse_y = pg.mouse.get_pos()
+                mouse_pos = pg.mouse.get_pos()
                 # Check if the mouse click is within the region of Option 1
-                if 0.35 * SCREEN_HEIGHT < mouse_y < 0.45 * SCREEN_HEIGHT:
-                    #launch_game()
-                    print("New Game")
-                    print(SCREEN_WIDTH)
-                # Check for Option 2
-                elif 0.55 * SCREEN_HEIGHT < mouse_y < 0.65 * SCREEN_HEIGHT:
-                    #load_menu()
-                    print("Load")
-                # Check for Option 3
-                elif 0.75 * SCREEN_HEIGHT < mouse_y < 0.85 * SCREEN_HEIGHT:
-                    #self.game.change_state('Outro')
-                    print("Settings")
-            
+                for button in self.all_buttons:
+                    if button.rect.collidepoint(mouse_pos) and button.tag == 'NewGame':
+                        self.game.change_state('Game')
+                        print("New Game")
+                    # Check for Option 2
+                    elif button.rect.collidepoint(mouse_pos) and button.tag == 'Load':
+                        #load_menu()
+                        print("Load")
+                    # Check for Option 3
+                    elif button.rect.collidepoint(mouse_pos) and button.tag == 'Settings':
+                        #self.game.change_state('Outro')
+                        print("Settings")
+                    
+class Game(State):
+    """
+    Game state
+    """
+    def boot(self):       
+        print('boot')
+        
+    def enter(self):
+        # when the state becomes the current state
+        print('enter')
+
+    def update(self):
+        # on every frame, call the update method of the base class
+        super().update()
+        # check if any key is pressed                   
 
 class Outro(State):
     """
