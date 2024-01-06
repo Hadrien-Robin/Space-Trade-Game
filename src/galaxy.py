@@ -28,7 +28,10 @@ class Galaxy:
         self.stars = {}
         self.way = []
         self.generate()
-
+        print(self.stars)
+        this_one = list(self.stars.keys())[0]
+        self.stars[this_one].explore()
+        
 
     def generate(self):
         ALPHA = 1       #this control the distance impact on the probabily of having a pathway between two stars.
@@ -128,9 +131,52 @@ class Star:
     def __init__(self,name,crd):
         self.coordinates = crd
         self.name = name
+        self.type = 'M'
+        self.objects = []
         
     def explore(self):
         """
         Explore the system and populate it
         """
         print("populating",self.name)
+
+        while len(self.objects) <= 10:
+            if random.uniform(0,1) <= 0.8:
+                self.objects.append(System_object(self,"rocky planet"))
+            else:
+                break
+
+        rand = random.uniform(0,1)
+        if  rand <= 0.8:
+            self.objects.append(System_object(self,"asteroid belt"))
+
+        for it in range(0,2):
+            if random.uniform(0,1) <= 0.5:
+                self.objects.append(System_object(self,"gas giant"))
+
+        if rand <= 0.1:
+            self.objects.append(System_object(self,"asteroid belt"))
+
+        for it in range(0,2):
+            if random.uniform(0,1) <= 0.5:
+                self.objects.append(System_object(self,"icy giant"))
+
+        print("populated with ",len(self.objects), " object(s).")
+
+class System_object:
+    """
+    System objects class
+    """
+
+    def __init__(self,star,obj_type):
+        self.type = obj_type
+        self.name = star.name
+        LETTER_NAME = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o']
+        if obj_type != "asteroid belt":
+            self.name += LETTER_NAME[len(star.objects)]
+        else:
+            self.name = star.name +"'s asteroid belt"
+            for it in star.objects:
+                if it.name == "asteroid belt":
+                    self.name == "II"
+        print("Generated a(n) ",self.type)
