@@ -24,6 +24,7 @@ class Memory:
     def __init__(self):
         self.Pilote = {}
         self.Business ={}
+        self.Player = {}
         self.Galaxy = Galaxy()
 
     def save(self, file_name):
@@ -49,4 +50,7 @@ class Memory:
                 return game_state
         except (IOError,ValueError):
             print("Error: Unable to load game state.")
+        
+    def move_player(self,system):
+        self.Player.update({"System":system})
         

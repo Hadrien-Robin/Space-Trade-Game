@@ -19,6 +19,8 @@ import os
 import pygame as pg
 from components import *
 from settings import *
+import memory as mry
+import random 
 
 class State:
     """
@@ -32,6 +34,7 @@ class State:
         # all sprites in the state
         self.all_sprites = pg.sprite.Group()
         self.all_buttons = pg.sprite.Group()
+        self.all_frames = pg.sprite.Group()
         self.boot()
 
     def boot(self):
@@ -68,6 +71,7 @@ class State:
         Called on every frame
         """
         self.all_sprites.draw(screen)
+        self.all_frames.draw(screen)
 
 class Intro(State):
     """
@@ -76,7 +80,33 @@ class Intro(State):
     def boot(self):
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
         # load the intro sound
-        self.game.audio.load_sound('intro', os.path.join(assets_dir, 'sounds', 'intro.wav'))
+        self.game.audio.load_sound('intro', os.path.join(assets_dir, 'sounds', 'start_screen_st.mp3'))
+
+        # add a background image
+        rand_bg = random.randint(1,3)
+        bg = ImageSprite(self.game, os.path.join(assets_dir, 'images', 'start_screen', 'start_screen_bg'+str(rand_bg)+'.png'))
+        bg.rect.topleft = (0,0)
+        self.all_sprites.add(bg)
+
+        # add the starfield overlays
+        SF_WIDTH = 4096
+        self.all_starfields = pg.sprite.Group()
+        rand_sf = random.randint(1,4)
+        starfield1 = ImageSprite(self.game, os.path.join(assets_dir, 'images', 'start_screen', 'Starfield'+str(rand_sf)+'.png'))
+        starfield1.rect.topleft = (0,0)
+        self.all_sprites.add(starfield1)
+        self.all_starfields.add(starfield1)
+        
+        starfield2 = ImageSprite(self.game, os.path.join(assets_dir, 'images', 'start_screen', 'Starfield'+str(rand_sf)+'.png'))
+        starfield2.rect.topleft = (SF_WIDTH,0)
+        self.all_sprites.add(starfield2)
+        self.all_starfields.add(starfield2)
+
+        #add a spaceship sprite
+        spaceship = ImageSprite(self.game, os.path.join(assets_dir, 'images', 'Player_sprite.png'))
+        spaceship.rect.center = (0.2*SCREEN_WIDTH,0.5*SCREEN_HEIGHT)
+        self.all_sprites.add(spaceship)
+        
         # add some text
         # center text on screen
         # add the text to the all_sprites group
@@ -131,7 +161,7 @@ class Intro(State):
                 # Check if the mouse click is within the region of Option 1
                 for button in self.all_buttons:
                     if button.rect.collidepoint(mouse_pos) and button.tag == 'NewGame':
-                        self.game.change_state('Game')
+                        self.game.change_state('Pilote')
                         print("New Game")
                     # Check for Option 2
                     elif button.rect.collidepoint(mouse_pos) and button.tag == 'Load':
@@ -141,13 +171,36 @@ class Intro(State):
                     elif button.rect.collidepoint(mouse_pos) and button.tag == 'Settings':
                         #self.game.change_state('Outro')
                         print("Settings")
-                    
-class Game(State):
+        sf_speed = SCREEN_WIDTH/(60*5)
+        for sf in self.all_starfields:
+            sf.rect.x -= sf_speed
+            if sf.rect.right < 0:
+                sf.rect.x += 4096
+        
+class Pilote(State):
     """
-    Game state
+    Pilote game state
     """
-    def boot(self):       
-        print('boot')
+    def boot(self):
+        self.game.memory.move_player(list(self.game.memory.Galaxy.stars.keys())[0])
+        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        
+        #BORDER = 0.05
+        #Draw map
+        size_drw = (SCREEN_WIDTH*0.45, SCREEN_HEIGHT*0.85)
+        map_bg = ShapeSprite(self.game,"rect", color = BLACK,size = size_drw)
+        map_bg.rect.topleft = (0.025*SCREEN_WIDTH, 0.1*SCREEN_HEIGHT)
+        self.all_sprites.add(map_bg)
+
+        #Draw frame
+        size_drw2 = (size_drw[0]*370/338, size_drw[1]*612/578) 
+        map_fr = ImageSprite(self.game, os.path.join(assets_dir, 'images','UI', 'frame_map.png'))
+        map_fr.image = pg.transform.scale(map_fr.image, size_drw2)
+        map_fr.rect = map_fr.image.get_rect()
+        map_fr.rect.center = map_bg.rect.center
+        map_fr.rect.top += size_drw2[1]*8/(612*2)
+        self.all_frames.add(map_fr)
+        
         
     def enter(self):
         # when the state becomes the current state
@@ -191,4 +244,4 @@ class Outro(State):
 # add the states to the __all__ list
 # this is needed so that the states can be imported using the * syntax
 # the first item in the list is the default state
-__all__ = ['Intro', 'Outro']
+__all__ = ['Intro', 'Pilote', 'Outro']

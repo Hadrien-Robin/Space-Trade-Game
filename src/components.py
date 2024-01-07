@@ -22,7 +22,26 @@ class ImageSprite(pg.sprite.Sprite):
         self.image.set_colorkey((0,0,0))
         # get the rect
         self.rect = self.image.get_rect()
-        
+
+class ShapeSprite(pg.sprite.Sprite):
+    """
+    Sprite class for loading and displaying images
+    """
+    def __init__(self, game, shape, color = (0,0,0), size = 10):
+        """
+        game: game object
+        shape: a 
+        """
+
+        super().__init__()
+        self.game = game
+        # draw the shape
+        if shape == "rect":
+            self.image = pg.Surface(size)
+            self.image.fill(color)
+
+        # get the rect
+        self.rect = self.image.get_rect()        
 
 class TextSprite(pg.sprite.Sprite):
     """

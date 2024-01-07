@@ -179,4 +179,4 @@ class System_object:
             for it in star.objects:
                 if it.name == "asteroid belt":
                     self.name == "II"
-        print("Generated a(n) ",self.type)
+        print("Generated a(n) ",self.type, " named ", self.name)

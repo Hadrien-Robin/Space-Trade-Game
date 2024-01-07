@@ -31,8 +31,9 @@ class Game:
         self.clock = pg.time.Clock()
         self.input = Input()
         self.audio = Audio()
-        self.init_states()
         self.memory = Memory()
+        self.init_states()
+
 
 
     def register_state(self, state):
