@@ -173,10 +173,10 @@ class System_object:
         self.name = star.name
         LETTER_NAME = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o']
         if obj_type != "asteroid belt":
-            self.name += LETTER_NAME[len(star.objects)]
+            self.name += ' ' + LETTER_NAME[len(star.objects) - sum(1 for Ob in star.objects if Ob.type == "asteroid belt") + 1]
         else:
             self.name = star.name +"'s asteroid belt"
             for it in star.objects:
                 if it.name == "asteroid belt":
-                    self.name == "II"
+                    self.name += " II"
         print("Generated a(n) ",self.type, " named ", self.name)
