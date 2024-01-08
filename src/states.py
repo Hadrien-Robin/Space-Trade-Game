@@ -193,14 +193,24 @@ class Pilote(State):
         self.all_sprites.add(map_bg)
 
         #Draw frame
-        size_drw2 = (size_drw[0]*370/338, size_drw[1]*612/578) 
-        map_fr = ImageSprite(self.game, os.path.join(assets_dir, 'images','UI', 'frame_map.png'))
-        map_fr.image = pg.transform.scale(map_fr.image, size_drw2)
-        map_fr.rect = map_fr.image.get_rect()
-        map_fr.rect.center = map_bg.rect.center
-        map_fr.rect.top += size_drw2[1]*8/(612*2)
-        self.all_frames.add(map_fr)
+##        size_drw2 = (round(size_drw[0]*370/338), round(size_drw[1]*612/578)) 
+##        map_fr = ImageSprite(self.game, os.path.join(assets_dir, 'images','UI', 'frame_map.png'))
+##        map_fr.image = pg.transform.scale(map_fr.image, size_drw2)
+##        map_fr.rect = map_fr.image.get_rect()
+##        map_fr.rect.center = map_bg.rect.center
+##        map_fr.rect.top += size_drw2[1]*8/(612*2)
+##        self.all_frames.add(map_fr)
         
+##        #Test for second frame
+##        size_drw2 = (round(size_drw[0]*370/338), round(size_drw[1]*612/578)) 
+##        map_fr2 = ImageSprite(self.game, os.path.join(assets_dir, 'images','UI', 'frame_map.png'))
+##        map_fr2.image = slice_sprite(map_fr2.image, 32, 32, 26, 38, size_drw2[0],size_drw2[1])
+##        map_fr2.rect  = map_fr2.image.get_rect()
+##        map_fr2.rect.center = map_bg.rect.center
+##        map_fr2.rect.centery += size_drw2[1]*8/(612*2)
+##        self.all_frames.add(map_fr2)        
+
+        self.all_frames.add(map_bg.generate_frame())
         
     def enter(self):
         # when the state becomes the current state
