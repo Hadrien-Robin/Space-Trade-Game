@@ -29,7 +29,7 @@ LIGHTGRAY = (100, 100, 100)
 GAME_TITLE = "Space Trade Game"
 SCREEN_WIDTH = 800  #Overided when in fullscreen mode
 SCREEN_HEIGHT = 600 #Overided when in fullscreen mode
-FULLSCREEN = True
+FULLSCREEN = False
 FPS = 60
 BACKGROUND_COLOR = DARKGRAY
 

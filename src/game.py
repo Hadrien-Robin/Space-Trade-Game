@@ -28,6 +28,10 @@ class Game:
         pg.display.set_caption(st.GAME_TITLE)
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
 
+        
+        # clear the screen
+        self.screen.fill(st.BACKGROUND_COLOR)
+
         # add the loading text
         text = TextSprite(self,
                 os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
@@ -37,9 +41,6 @@ class Game:
         self.all_loading = pg.sprite.Group()
         self.all_loading.add(text)
         self.all_loading.draw(self.screen)
-
-        # clear the screen
-        self.screen.fill(st.BACKGROUND_COLOR)
         
         # flip the display
         pg.display.flip()
