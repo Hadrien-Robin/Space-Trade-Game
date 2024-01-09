@@ -28,6 +28,25 @@ class Game:
             self.screen = pg.display.set_mode((st.SCREEN_WIDTH,st.SCREEN_HEIGHT))
 
         pg.display.set_caption(st.GAME_TITLE)
+        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+
+        # add the loading text
+        text = TextSprite(self,
+                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                "Loading", 24, color = (255,255,255))
+        # center text on screen
+        text.rect.center = self.screen.get_rect().center
+        self.all_loading = pg.sprite.Group()
+        self.all_loading.add(text)
+        self.all_loading.draw(self.screen)
+
+        # clear the screen
+        self.screen.fill(st.BACKGROUND_COLOR)
+        
+        # flip the display
+        pg.display.flip()
+
+
         self.clock = pg.time.Clock()
         self.input = Input()
         self.audio = Audio()
@@ -43,6 +62,7 @@ class Game:
         state: state object
         """
         self.states[type(state).__name__] = state
+        print(type(state).__name__," here")
 
     def init_states(self):
         """
@@ -53,9 +73,10 @@ class Game:
         # iterate over __all__ states from states.py instantiate them
         # and register to the self.states with state.name as the key and state instance 
         # as value
+        
         for State in map(states.__dict__.get, states.__all__):
             self.register_state(State(self))
-
+            print(State)
         # initialize the first state
         first_state = list(self.states.keys())[0]
         self.change_state(first_state)

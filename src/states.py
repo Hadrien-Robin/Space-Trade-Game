@@ -185,32 +185,14 @@ class Pilote(State):
         self.game.memory.move_player(list(self.game.memory.Galaxy.stars.keys())[0])
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
         
-        #BORDER = 0.05
         #Draw map
         size_drw = (SCREEN_WIDTH*0.45, SCREEN_HEIGHT*0.85)
         map_bg = ShapeSprite(self.game,"rect", color = BLACK,size = size_drw)
-        map_bg.rect.topleft = (0.025*SCREEN_WIDTH, 0.1*SCREEN_HEIGHT)
-        self.all_sprites.add(map_bg)
-
-        #Draw frame
-##        size_drw2 = (round(size_drw[0]*370/338), round(size_drw[1]*612/578)) 
-##        map_fr = ImageSprite(self.game, os.path.join(assets_dir, 'images','UI', 'frame_map.png'))
-##        map_fr.image = pg.transform.scale(map_fr.image, size_drw2)
-##        map_fr.rect = map_fr.image.get_rect()
-##        map_fr.rect.center = map_bg.rect.center
-##        map_fr.rect.top += size_drw2[1]*8/(612*2)
-##        self.all_frames.add(map_fr)
-        
-##        #Test for second frame
-##        size_drw2 = (round(size_drw[0]*370/338), round(size_drw[1]*612/578)) 
-##        map_fr2 = ImageSprite(self.game, os.path.join(assets_dir, 'images','UI', 'frame_map.png'))
-##        map_fr2.image = slice_sprite(map_fr2.image, 32, 32, 26, 38, size_drw2[0],size_drw2[1])
-##        map_fr2.rect  = map_fr2.image.get_rect()
-##        map_fr2.rect.center = map_bg.rect.center
-##        map_fr2.rect.centery += size_drw2[1]*8/(612*2)
-##        self.all_frames.add(map_fr2)        
-
+        map_bg.rect.topleft = (0.05*SCREEN_WIDTH, 0.1*SCREEN_HEIGHT)
+        self.all_sprites.add(map_bg)     
         self.all_frames.add(map_bg.generate_frame())
+
+        
         
     def enter(self):
         # when the state becomes the current state
@@ -221,37 +203,22 @@ class Pilote(State):
         super().update()
         # check if any key is pressed                   
 
-class Outro(State):
+class Loading(State):
     """
     Outro state
     """
     def boot(self):
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
-        # add some text
+        # add the loading text
         text = TextSprite(self.game,
                 os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                "Outro", 24, color = (255,255,255))
+                "Loading", 24, color = (255,255,255))
         # center text on screen
         text.rect.center = self.game.screen.get_rect().center
         # add the text to the all_sprites group
         self.all_sprites.add(text)
 
-        # add the "any key" text
-        any_key_text = TextSprite(self.game,
-                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                "Press any key to quit", 12, color = (255,255,255))
-        any_key_text.rect.center = self.game.screen.get_rect().center
-        any_key_text.rect.top = text.rect.bottom + 10
-        # add the text to the all_sprites group
-        self.all_sprites.add(any_key_text)
-
-    def update(self):
-        super().update()
-        # check if any key is pressed
-        if self.game.input.is_key_pressed('any'):
-            self.game.quit()
-
 # add the states to the __all__ list
 # this is needed so that the states can be imported using the * syntax
 # the first item in the list is the default state
-__all__ = ['Intro', 'Pilote', 'Outro']
+__all__ = ['Intro', 'Pilote','Loading'] #exclude loading
