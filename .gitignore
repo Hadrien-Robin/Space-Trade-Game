@@ -127,3 +127,6 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+/.vs
+/Space Trade Game.pyproj
+/Space Trade Game.sln
