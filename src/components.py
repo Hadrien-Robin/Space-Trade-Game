@@ -10,11 +10,11 @@ class CustomSprite(pg.sprite.Sprite):
     def generate_frame(self):
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
         frame = ImageSprite(self.game, os.path.join(assets_dir, 'images','UI', 'frame_map.png'))
-        size = (self.image.get_width()*370/338,self.image.get_height()*612/578)
+        size = (self.image.get_width() + 32,self.image.get_height() + 32)
         frame.image = slice_sprite(frame.image, 32, 32, 26, 38, size[0],size[1])    
         frame.rect = frame.image.get_rect()
         frame.rect.center = self.rect.center
-        frame.rect.centery += size[1]*8/(612*2)
+        frame.rect.centery += 5
         return frame
 
 class ImageSprite(CustomSprite):
