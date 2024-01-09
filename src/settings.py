@@ -29,13 +29,12 @@ LIGHTGRAY = (100, 100, 100)
 GAME_TITLE = "Space Trade Game"
 SCREEN_WIDTH = 800  #Overided when in fullscreen mode
 SCREEN_HEIGHT = 600 #Overided when in fullscreen mode
-FULLSCREEN = False
+FULLSCREEN = True
 FPS = 60
 BACKGROUND_COLOR = DARKGRAY
 
 
 
 if FULLSCREEN == True:
-    import ctypes
-    user32 = ctypes.windll.user32
-    SCREEN_WIDTH,SCREEN_HEIGHT = user32.GetSystemMetrics(0), user32.GetSystemMetrics(1)
+    import pyautogui
+    SCREEN_WIDTH,SCREEN_HEIGHT = pyautogui.size()
