@@ -7,11 +7,14 @@ import os
 
 class CustomSprite(pg.sprite.Sprite):
     
-    def generate_frame(self):
+    def generate_frame(self, Background = False):
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
-        frame = ImageSprite(self.game, os.path.join(assets_dir, 'images','UI', 'frame_map.png'))
+        if Background == False:
+            frame = ImageSprite(self.game, os.path.join(assets_dir, 'images','UI', 'frame_map.png'))
+        elif Background == True:
+            frame = ImageSprite(self.game, os.path.join(assets_dir, 'images','UI','background_menu.png'))
         size = (self.image.get_width() + 32,self.image.get_height() + 32)
-        frame.image = slice_sprite(frame.image, 32, 32, 26, 38, size[0],size[1])    
+        frame.image = slice_sprite(frame.image, 32, 32, 27, 38, size[0],size[1])    
         frame.rect = frame.image.get_rect()
         frame.rect.center = self.rect.center
         frame.rect.centery += 5
@@ -42,7 +45,7 @@ class ShapeSprite(CustomSprite):
     """
     Sprite class for loading and displaying images
     """
-    def __init__(self, game, shape, color = (0,0,0), size = 10):
+    def __init__(self, game, shape, color = (0,0,0), size = (10,10)):
         """
         game: game object
         shape: a 
@@ -96,6 +99,13 @@ class TextSprite(pg.sprite.Sprite):
         """
         return pg.font.Font(self.font_path, size)
 
+    def make_button(self, size):
+        shape = ShapeSprite(self.game,'rect',size=size)
+        button_bg = shape.generate_frame(Background=True)
+        button_bg.image.blit(self.image,((button_bg.rect.w - self.rect.w)*0.5,(button_bg.rect.h - self.rect.h)*0.5), special_flags=pg.BLEND_PREMULTIPLIED)
+        self.image = button_bg.image
+        self.rect = button_bg.image.get_rect()
+        
 
     
 
@@ -106,6 +116,12 @@ def slice_sprite(sprite, left, right, top, bottom, width, height, draw_mode="SLI
     # get the size of the sprite
     sprite_width = sprite.get_width()
     sprite_height= sprite.get_height()
+
+    if height < top + bottom:
+        height = top+bottom
+    if width < top + bottom:
+        width = top+bottom
+    
 
     # create a new surface to draw the sliced sprite on
     sliced_sprite = pg.Surface((width, height),pg.SRCALPHA)
@@ -174,3 +190,4 @@ def slice_sprite(sprite, left, right, top, bottom, width, height, draw_mode="SLI
                 sprite_width - right, sprite_height - bottom, right, bottom), (width - right, height - bottom),special_flags = pg.BLEND_PREMULTIPLIED)
 
     return sliced_sprite
+

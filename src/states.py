@@ -71,7 +71,9 @@ class State:
         Called on every frame
         """
         self.all_sprites.draw(screen)
+        self.all_buttons.draw(screen)
         self.all_frames.draw(screen)
+
 
 class Intro(State):
     """
@@ -154,7 +156,8 @@ class Intro(State):
     def update(self):
         # on every frame, call the update method of the base class
         super().update()
-        # check if any key is pressed
+       
+       # check if any key is pressed
         if self.game.input.is_mouse_pressed(1):
                 print("Mouse press")
                 mouse_pos = pg.mouse.get_pos()
@@ -184,23 +187,43 @@ class Pilote(State):
     def boot(self):
         self.game.memory.move_player(list(self.game.memory.Galaxy.stars.keys())[0])
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
-        
+
         #Draw map
-        size_drw = (SCREEN_WIDTH*0.45, SCREEN_HEIGHT*0.85)
+        size_drw = (SCREEN_WIDTH*0.4, SCREEN_HEIGHT*0.8)
         map_bg = ShapeSprite(self.game,"rect", color = BLACK,size = size_drw)
-        map_bg.rect.topleft = (0.05*SCREEN_WIDTH, 0.1*SCREEN_HEIGHT)
-        self.all_sprites.add(map_bg)     
+        map_bg.rect.topleft = (0.05*SCREEN_WIDTH, 0.125*SCREEN_HEIGHT)
+        self.all_sprites.add(map_bg)
         self.all_frames.add(map_bg.generate_frame())
 
-        
+        #Draw right menu
+        menu_shape = ShapeSprite(self.game, "rect", color = BLACK, size = size_drw)
+        menu_shape.rect.topright = (0.95*SCREEN_WIDTH, 0.125*SCREEN_HEIGHT)
+        self.all_sprites.add(menu_shape.generate_frame(Background=True))
+
         
     def enter(self):
         # when the state becomes the current state
+        #set the current submenu to main
+        self.menu_state = 'main'
         print('enter')
 
     def update(self):
         # on every frame, call the update method of the base class
         super().update()
+        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        
+       # check which menu is currently display
+        match self.menu_state:
+            case 'main':
+               enter_button = TextSprite(self.game,
+                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                "Enter system", 12, color = (255,255,255),tag='enter')
+               size = (SCREEN_WIDTH*0.4*0.9,enter_button.rect.h)
+               enter_button.make_button(size)
+               enter_button.rect.centerx = 0.75*SCREEN_WIDTH
+               enter_button.rect.top = 0.15*SCREEN_HEIGHT
+               self.all_buttons.add(enter_button)
+
         # check if any key is pressed                   
 
 class Loading(State):
