@@ -102,7 +102,7 @@ class TextSprite(pg.sprite.Sprite):
     def make_button(self, size):
         shape = ShapeSprite(self.game,'rect',size=size)
         button_bg = shape.generate_frame(Background=True)
-        button_bg.image.blit(self.image,((button_bg.rect.w - self.rect.w)*0.5,(button_bg.rect.h - self.rect.h)*0.5), special_flags=pg.BLEND_PREMULTIPLIED)
+        button_bg.image.blit(self.image,((button_bg.rect.w - self.rect.w)*0.5,(button_bg.rect.h - self.rect.h)*0.5 -5), special_flags=pg.BLEND_PREMULTIPLIED)
         self.image = button_bg.image
         self.rect = button_bg.image.get_rect()
         
