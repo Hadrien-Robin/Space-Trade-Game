@@ -185,7 +185,8 @@ class Pilote(State):
     Pilote game state
     """
     def boot(self):
-        self.game.memory.move_player(list(self.game.memory.Galaxy.stars.keys())[0])
+        self.game.memory.move_player(list(self.game.memory.Galaxy.stars.values())[0])
+        print(list(self.game.memory.Galaxy.stars.keys())[0])
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
 
         #Draw map
@@ -198,8 +199,9 @@ class Pilote(State):
         #Draw right menu
         menu_shape = ShapeSprite(self.game, "rect", color = BLACK, size = size_drw)
         menu_shape.rect.topright = (0.95*SCREEN_WIDTH, 0.125*SCREEN_HEIGHT)
-        self.all_sprites.add(menu_shape.generate_frame(Background=True))
-
+        menu_background = menu_shape.generate_frame(Background=True)
+        self.all_sprites.add(menu_background)
+        print(menu_background.rect.bottom, menu_background.rect.top)
         
     def enter(self):
         # when the state becomes the current state
@@ -215,14 +217,46 @@ class Pilote(State):
        # check which menu is currently display
         match self.menu_state:
             case 'main':
+               title_button = TextSprite(self.game,
+                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                self.game.memory.Player["System"].name, 12, color = (255,255,255))
+               size = (SCREEN_WIDTH*0.4*0.9,title_button.rect.h)
+               title_button.make_button(size)
+               title_button.rect.centerx = 0.75*SCREEN_WIDTH
+               title_button.rect.top = 0.15*SCREEN_HEIGHT
+               self.all_buttons.add(title_button)     
+               
                enter_button = TextSprite(self.game,
                 os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
                 "Enter system", 12, color = (255,255,255),tag='enter')
-               size = (SCREEN_WIDTH*0.4*0.9,enter_button.rect.h)
                enter_button.make_button(size)
-               enter_button.rect.centerx = 0.75*SCREEN_WIDTH
-               enter_button.rect.top = 0.15*SCREEN_HEIGHT
+               enter_button.rect.center = title_button.rect.center
+               enter_button.rect.centery += 0.175*SCREEN_HEIGHT
                self.all_buttons.add(enter_button)
+               
+               travel_button = TextSprite(self.game,
+                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                "Leave the system", 12, color = (255,255,255),tag='travel')
+               travel_button.make_button(size)
+               travel_button.rect.center = title_button.rect.center
+               travel_button.rect.centery += 0.325*SCREEN_HEIGHT
+               self.all_buttons.add(travel_button)
+               
+               logs_button = TextSprite(self.game,
+                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                "Check logs", 12, color = (255,255,255),tag='logs')
+               logs_button.make_button(size)
+               logs_button.rect.center = title_button.rect.center
+               logs_button.rect.centery += 0.475*SCREEN_HEIGHT
+               self.all_buttons.add(logs_button) 
+
+               inventory_button = TextSprite(self.game,
+                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                "Check inventory", 12, color = (255,255,255),tag='inventory')
+               inventory_button.make_button(size)
+               inventory_button.rect.center = title_button.rect.center
+               inventory_button.rect.centery += 0.625*SCREEN_HEIGHT
+               self.all_buttons.add(inventory_button)
 
         # check if any key is pressed                   
 
