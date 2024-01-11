@@ -33,7 +33,7 @@ class ImageSprite(CustomSprite):
         super().__init__()
         self.game = game
         # load the image
-        self.image = pg.image.load(path)
+        self.image = pg.image.load(path).convert_alpha()
         # set the colorkey to black
         self.image.set_colorkey((0,0,0))
         # get the rect
@@ -55,7 +55,7 @@ class ShapeSprite(CustomSprite):
         self.game = game
         # draw the shape
         if shape == "rect":
-            self.image = pg.Surface(size)
+            self.image = pg.Surface(size, pg.SRCALPHA)
             self.image.fill(color)
 
         # get the rect
@@ -104,6 +104,7 @@ class TextSprite(pg.sprite.Sprite):
         button_bg = shape.generate_frame(Background=True)
         button_bg.image.blit(self.image,((button_bg.rect.w - self.rect.w)*0.5,(button_bg.rect.h - self.rect.h)*0.5 -5), special_flags=pg.BLEND_PREMULTIPLIED)
         self.image = button_bg.image
+        self.image.set_colorkey((0,0,0))
         self.rect = button_bg.image.get_rect()
         
 
@@ -191,3 +192,11 @@ def slice_sprite(sprite, left, right, top, bottom, width, height, draw_mode="SLI
 
     return sliced_sprite
 
+def make_arrow(game, direction, size):
+    assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+    button = ImageSprite(game, os.path.join(assets_dir, 'images', 'UI', direction+'.png'))
+    button.image = slice_sprite(button.image, 34, 34, 29, 39, 1.5*size[0],1.5*size[1])
+    button.image.set_colorkey((0,0,0))
+    button.rect = button.image.get_rect()
+    return button
+    
