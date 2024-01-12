@@ -66,8 +66,8 @@ class Input:
 
 
     def update(self):
-        self.keys_pressed = set()
-        self.mouse_pressed = set()
+        self.keys_pressed.clear()
+        self.mouse_pressed.clear()
 
     def handle_event(self, event):
         """
@@ -102,8 +102,10 @@ class Input:
                         key_name = self.modifier_key_names[key]
                         self.keys_down.discard(key_name)
         if event.type == MOUSEBUTTONDOWN:
-            self.mouse_down.add(event.button)
-            self.mouse_pressed.add(event.button)
+            if event.button not in self.mouse_down:
+                self.mouse_down.add(event.button)
+                self.mouse_pressed.add(event.button)
 
         if event.type == MOUSEBUTTONUP:
             self.mouse_down.discard(event.button)
+            print("released")
