@@ -188,7 +188,8 @@ class Pilote(State):
         self.game.memory.move_player(list(self.game.memory.Galaxy.stars.values())[0])
         print(list(self.game.memory.Galaxy.stars.keys())[0])
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
-
+        self.menu_drawn = False
+        
         #Draw map
         size_drw = (SCREEN_WIDTH*0.4, SCREEN_HEIGHT*0.8)
         map_bg = ShapeSprite(self.game,"rect", color = BLACK,size = size_drw)
@@ -201,12 +202,13 @@ class Pilote(State):
         menu_shape.rect.topright = (0.95*SCREEN_WIDTH, 0.125*SCREEN_HEIGHT)
         menu_background = menu_shape.generate_frame(Background=True)
         self.all_sprites.add(menu_background)
-        print(menu_background.rect.bottom, menu_background.rect.top)
         
     def enter(self):
         # when the state becomes the current state
         #set the current submenu to main
         self.menu_state = 'main'
+        self.menu_page = 0
+        self.menu_obj = 0
         print('enter')
 
     def update(self):
@@ -215,54 +217,184 @@ class Pilote(State):
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
         
        # check which menu is currently display
-        match self.menu_state:
-            case 'main':
-               title_button = TextSprite(self.game,
-                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                self.game.memory.Player["System"].name, 12, color = (255,255,255))
-               size = (SCREEN_WIDTH*0.4*0.9,title_button.rect.h)
-               title_button.make_button(size)
-               title_button.rect.centerx = 0.75*SCREEN_WIDTH
-               title_button.rect.top = 0.15*SCREEN_HEIGHT
-               self.all_buttons.add(title_button)     
+        if self.menu_drawn == False:
+            print(self.menu_drawn)
+            match self.menu_state:
+                case 'main':
+                   title_button = TextSprite(self.game,
+                    os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                    self.game.memory.Player["System"].name, 12, color = (255,255,255))
+                   size = (SCREEN_WIDTH*0.4*0.9,title_button.rect.h)
+                   title_button.make_button(size)
+                   title_button.rect.centerx = 0.75*SCREEN_WIDTH
+                   title_button.rect.top = 0.15*SCREEN_HEIGHT
+                   self.all_buttons.add(title_button)     
                
-               enter_button = TextSprite(self.game,
-                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                "Enter system", 12, color = (255,255,255),tag='enter')
-               enter_button.make_button(size)
-               enter_button.rect.center = title_button.rect.center
-               enter_button.rect.centery += 0.175*SCREEN_HEIGHT
-               self.all_buttons.add(enter_button)
+                   enter_button = TextSprite(self.game,
+                    os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                    "Enter system", 12, color = (255,255,255),tag='enter')
+                   enter_button.make_button(size)
+                   enter_button.rect.center = title_button.rect.center
+                   enter_button.rect.centery += 0.175*SCREEN_HEIGHT
+                   self.all_buttons.add(enter_button)
                
-               travel_button = TextSprite(self.game,
-                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                "Leave the system", 12, color = (255,255,255),tag='travel')
-               travel_button.make_button(size)
-               travel_button.rect.center = title_button.rect.center
-               travel_button.rect.centery += 0.325*SCREEN_HEIGHT
-               self.all_buttons.add(travel_button)
+                   travel_button = TextSprite(self.game,
+                    os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                    "Leave the system", 12, color = (255,255,255),tag='travel')
+                   travel_button.make_button(size)
+                   travel_button.rect.center = title_button.rect.center
+                   travel_button.rect.centery += 0.325*SCREEN_HEIGHT
+                   self.all_buttons.add(travel_button)
                
-               logs_button = TextSprite(self.game,
-                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                "Check logs", 12, color = (255,255,255),tag='logs')
-               logs_button.make_button(size)
-               logs_button.rect.center = title_button.rect.center
-               logs_button.rect.centery += 0.475*SCREEN_HEIGHT
-               self.all_buttons.add(logs_button) 
+                   logs_button = TextSprite(self.game,
+                    os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                    "Check logs", 12, color = (255,255,255),tag='logs')
+                   logs_button.make_button(size)
+                   logs_button.rect.center = title_button.rect.center
+                   logs_button.rect.centery += 0.475*SCREEN_HEIGHT
+                   self.all_buttons.add(logs_button) 
 
-               inventory_button = TextSprite(self.game,
-                os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                "Check inventory", 12, color = (255,255,255),tag='inventory')
-               inventory_button.make_button(size)
-               inventory_button.rect.center = title_button.rect.center
-               inventory_button.rect.centery += 0.625*SCREEN_HEIGHT
-               self.all_buttons.add(inventory_button)
+                   inventory_button = TextSprite(self.game,
+                    os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                    "Check inventory", 12, color = (255,255,255),tag='inventory')
+                   inventory_button.make_button(size)
+                   inventory_button.rect.center = title_button.rect.center
+                   inventory_button.rect.centery += 0.625*SCREEN_HEIGHT
+                   self.all_buttons.add(inventory_button)
 
-        # check if any key is pressed                   
+                   self.menu_drawn = True
+               
+                case 'system':
+                    # Title button is not printed, but serves as an anchor and size reference for other sprites.
+                    title_button = TextSprite(self.game,
+                        os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                        self.game.memory.Player["System"].name, 12, color = (255,255,255))
+                    size = (SCREEN_WIDTH*0.4*0.9,title_button.rect.h)
+                    title_button.make_button(size)
+                    title_button.rect.centerx = 0.75*SCREEN_WIDTH
+                    title_button.rect.top = 0
+                    
+                    Objects_list = self.game.memory.Galaxy.stars[self.game.memory.Player["System"].name].objects
+                    nbr_planets = len(Objects_list)
+                    # You can only print 4 objects at a time                 
+                    
+                    first_button = TextSprite(self.game,
+                        os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                        Objects_list[self.menu_obj].name, 12, color = (255,255,255),tag='first')
+                    first_button.make_button(size)
+                    first_button.rect.center = title_button.rect.center
+                    first_button.rect.centery += 0.175*SCREEN_HEIGHT
+                    self.all_buttons.add(first_button)                                            
 
+                    if nbr_planets >= 2:
+                        second_button = TextSprite(self.game,
+                            os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                            Objects_list[self.menu_obj +1].name, 12, color = (255,255,255),tag='second')
+                        second_button.make_button(size)
+                        second_button.rect.center = title_button.rect.center
+                        second_button.rect.centery += 0.325*SCREEN_HEIGHT
+                        self.all_buttons.add(second_button)
+                    
+                    if nbr_planets >= 3:
+                        third_button = TextSprite(self.game,
+                            os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                            Objects_list[self.menu_obj +2].name, 12, color = (255,255,255),tag='third')
+                        third_button.make_button(size)
+                        third_button.rect.center = title_button.rect.center
+                        third_button.rect.centery += 0.475*SCREEN_HEIGHT
+                        self.all_buttons.add(third_button) 
+                    
+                    if nbr_planets >= 4:
+                        fourth_button = TextSprite(self.game,
+                            os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                            Objects_list[self.menu_obj +3].name, 12, color = (255,255,255),tag='fourth')
+                        fourth_button.make_button(size)
+                        fourth_button.rect.center = title_button.rect.center
+                        fourth_button.rect.centery += 0.625*SCREEN_HEIGHT
+                        self.all_buttons.add(fourth_button)
+
+                    size_arrow = (title_button.rect.h,title_button.rect.h)
+                    if self.menu_obj > 0:
+                        left_arrow = make_arrow(self.game, 'left', size_arrow)
+                        
+                        left_arrow.rect.center = title_button.rect.center
+                        left_arrow.rect.centery += 0.775*SCREEN_HEIGHT
+                        left_arrow.rect.centerx -= 0.125*SCREEN_WIDTH
+                                                
+                        self.all_buttons.add(left_arrow)
+                        
+                    if self.menu_obj +3 < nbr_planets-1:
+                        right_arrow = make_arrow(self.game, 'right',size_arrow)
+                        
+                        right_arrow.rect.center = title_button.rect.center
+                        right_arrow.rect.centery += 0.775*SCREEN_HEIGHT
+                        right_arrow.rect.centerx += 0.125*SCREEN_WIDTH
+
+                        self.all_buttons.add(right_arrow)   
+
+                    back_arrow = make_arrow(self.game, 'back',size_arrow)
+                        
+                    back_arrow.rect.center = title_button.rect.center
+                    back_arrow.rect.centery += 0.775*SCREEN_HEIGHT
+                    
+                    self.all_buttons.add(back_arrow)                    
+
+                    self.menu_drawn = True
+                    
+       # check if any key is pressed
+        if self.game.input.is_mouse_pressed(1):
+                print("Mouse press")
+                mouse_pos = pg.mouse.get_pos()
+                # Check case
+                match self.menu_state:
+                    case 'main':
+                        for button in self.all_buttons:
+                            if button.rect.collidepoint(mouse_pos) and button.tag == 'enter':
+                                self.menu_state = 'system'
+                                self.all_buttons.empty()
+                                self.menu_drawn = False
+                            # Check for Option 2
+                            elif button.rect.collidepoint(mouse_pos) and button.tag == 'travel':
+                                print("Travel")
+                            # Check for Option 3
+                            elif button.rect.collidepoint(mouse_pos) and button.tag == 'logs':
+                                print("Logs")    
+                            elif button.rect.collidepoint(mouse_pos) and button.tag == 'inventory':
+                                #self.game.change_state('Outro')
+                                print("Inventory")         
+
+                    case 'system':
+                        for button in self.all_buttons:
+                            if button.rect.collidepoint(mouse_pos) and button.tag == 'first':
+                                print("first")
+                            # Check for Option 2
+                            elif button.rect.collidepoint(mouse_pos) and button.tag == 'second':
+                                print("second")
+                            # Check for Option 3
+                            elif button.rect.collidepoint(mouse_pos) and button.tag == 'third':
+                                print("third")    
+                            elif button.rect.collidepoint(mouse_pos) and button.tag == 'fourth':
+                                #self.game.change_state('Outro')
+                                print("fourth")
+                            elif button.rect.collidepoint(mouse_pos) and button.tag == 'back':
+                                print("Back")
+                                self.menu_state = 'main'
+                                self.all_buttons.empty()
+                                self.menu_drawn = False
+                            elif button.rect.collidepoint(mouse_pos) and button.tag == 'left':
+                                print("Left")
+                                self.all_buttons.empty()
+                                self.menu_drawn = False
+                                self.menu_obj -= 1
+                            elif button.rect.collidepoint(mouse_pos) and button.tag == 'right':
+                                print("right")
+                                self.all_buttons.empty()
+                                self.menu_drawn = False
+                                self.menu_obj += 1
+                                
 class Loading(State):
     """
-    Outro state
+    Loading screen state (Unused yet)
     """
     def boot(self):
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
