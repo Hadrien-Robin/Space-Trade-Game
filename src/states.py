@@ -246,21 +246,21 @@ class Pilote(State):
                    travel_button.rect.centery += 0.325*SCREEN_HEIGHT
                    self.all_buttons.add(travel_button)
                
-                   logs_button = TextSprite(self.game,
-                    os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                    "Check logs", 12, color = (255,255,255),tag='logs')
-                   logs_button.make_button(size)
-                   logs_button.rect.center = title_button.rect.center
-                   logs_button.rect.centery += 0.475*SCREEN_HEIGHT
-                   self.all_buttons.add(logs_button) 
-
                    inventory_button = TextSprite(self.game,
                     os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
                     "Check inventory", 12, color = (255,255,255),tag='inventory')
                    inventory_button.make_button(size)
                    inventory_button.rect.center = title_button.rect.center
-                   inventory_button.rect.centery += 0.625*SCREEN_HEIGHT
-                   self.all_buttons.add(inventory_button)
+                   inventory_button.rect.centery += 0.475*SCREEN_HEIGHT
+                   self.all_buttons.add(inventory_button) 
+
+                   logs_button = TextSprite(self.game,
+                    os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                    "Check logs", 12, color = (255,255,255),tag='logs')
+                   logs_button.make_button(size)
+                   logs_button.rect.center = title_button.rect.center
+                   logs_button.rect.centery += 0.625*SCREEN_HEIGHT
+                   self.all_buttons.add(logs_button)
 
                    self.menu_drawn = True
                
@@ -286,7 +286,7 @@ class Pilote(State):
                     first_button.rect.centery += 0.175*SCREEN_HEIGHT
                     self.all_buttons.add(first_button)                                            
 
-                    if nbr_planets >= 2:
+                    if nbr_planets >= 2+self.menu_obj:
                         second_button = TextSprite(self.game,
                             os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
                             Objects_list[self.menu_obj +1].name, 12, color = (255,255,255),tag='second')
@@ -295,7 +295,7 @@ class Pilote(State):
                         second_button.rect.centery += 0.325*SCREEN_HEIGHT
                         self.all_buttons.add(second_button)
                     
-                    if nbr_planets >= 3:
+                    if nbr_planets >= 3+self.menu_obj:
                         third_button = TextSprite(self.game,
                             os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
                             Objects_list[self.menu_obj +2].name, 12, color = (255,255,255),tag='third')
@@ -304,7 +304,7 @@ class Pilote(State):
                         third_button.rect.centery += 0.475*SCREEN_HEIGHT
                         self.all_buttons.add(third_button) 
                     
-                    if nbr_planets >= 4:
+                    if nbr_planets >= 4+self.menu_obj:
                         fourth_button = TextSprite(self.game,
                             os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
                             Objects_list[self.menu_obj +3].name, 12, color = (255,255,255),tag='fourth')
@@ -380,17 +380,18 @@ class Pilote(State):
                                 print("Back")
                                 self.menu_state = 'main'
                                 self.all_buttons.empty()
+                                self.menu_obj = 0
                                 self.menu_drawn = False
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'left':
                                 print("Left")
                                 self.all_buttons.empty()
                                 self.menu_drawn = False
-                                self.menu_obj -= 1
+                                self.menu_obj -= 4
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'right':
                                 print("right")
                                 self.all_buttons.empty()
                                 self.menu_drawn = False
-                                self.menu_obj += 1
+                                self.menu_obj += 4
                                 
 class Loading(State):
     """
