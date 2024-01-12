@@ -33,7 +33,7 @@ class Memory:
         save_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'save'))
         try:
             with open(os.path.join(save_dir,file_name), 'wb') as file:
-                json.dump(game_state, file)
+                json.dump(self, file)
                 print("Game state saved successfully!")
         except (IOError,ValueError):
             print("Error: Unable to save game state.")
