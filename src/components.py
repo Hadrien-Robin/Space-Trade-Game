@@ -24,7 +24,7 @@ class ImageSprite(CustomSprite):
     """
     Sprite class for loading and displaying images
     """
-    def __init__(self, game, path):
+    def __init__(self, game, path,tag=''):
         """
         game: game object
         path: path to the image file
@@ -38,6 +38,7 @@ class ImageSprite(CustomSprite):
         self.image.set_colorkey((0,0,0))
         # get the rect
         self.rect = self.image.get_rect()
+        self.tag = tag
         
 
     
@@ -45,7 +46,7 @@ class ShapeSprite(CustomSprite):
     """
     Sprite class for loading and displaying images
     """
-    def __init__(self, game, shape, color = (0,0,0), size = (10,10)):
+    def __init__(self, game, shape, color = (0,0,0), size = (10,10),tag=''):
         """
         game: game object
         shape: a 
@@ -59,7 +60,8 @@ class ShapeSprite(CustomSprite):
             self.image.fill(color)
 
         # get the rect
-        self.rect = self.image.get_rect()        
+        self.rect = self.image.get_rect()
+        self.tag = tag
     
 class TextSprite(pg.sprite.Sprite):
     """
@@ -194,7 +196,7 @@ def slice_sprite(sprite, left, right, top, bottom, width, height, draw_mode="SLI
 
 def make_arrow(game, direction, size):
     assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
-    button = ImageSprite(game, os.path.join(assets_dir, 'images', 'UI', direction+'.png'))
+    button = ImageSprite(game, os.path.join(assets_dir, 'images', 'UI', direction+'.png'), tag=direction)
     button.image = slice_sprite(button.image, 34, 34, 29, 39, 1.5*size[0],1.5*size[1])
     button.image.set_colorkey((0,0,0))
     button.rect = button.image.get_rect()
