@@ -15,7 +15,6 @@ The Galaxy class has the following attributes:
 import random
 import os
 import math
-from tkinter import SE, SEL
 
 
 

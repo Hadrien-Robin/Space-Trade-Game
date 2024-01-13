@@ -5,7 +5,6 @@ changing states.
 
 import os
 import sys
-import logging
 import pygame as pg
 from input import Input
 from audio import Audio

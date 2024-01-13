@@ -16,9 +16,6 @@ The State class has the following attributes:
 """
 
 import os
-from re import I, S
-from tkinter import SE
-from turtle import title
 import pygame as pg
 from components import *
 from settings import *
@@ -594,13 +591,6 @@ class Inventory(State):
                     self.all_sprites.add(title_button)
             
             self.menu_drawn = True  
-        
-        
-        
-
-     
-
-        
                         
 class Loading(State):
     """

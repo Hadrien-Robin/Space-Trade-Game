@@ -2,7 +2,6 @@
 This module handles input from the user.
 """
 
-import logging
 import pygame as pg
 import pygame.constants as pgc
 from pygame.locals import *
