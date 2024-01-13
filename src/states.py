@@ -16,9 +16,6 @@ The State class has the following attributes:
 """
 
 import os
-from re import I, S
-from tkinter import SE
-from turtle import title
 import pygame as pg
 from components import *
 from settings import *
@@ -67,9 +64,6 @@ class State:
         """
         # override this method to add logic that happens when changing
         # from this state to some other state
-        self.all_sprites.empty()
-        self.all_buttons.empty()
-        self.all_frames.empty()
         pass
 
     def draw(self, screen):
@@ -79,63 +73,8 @@ class State:
         self.all_sprites.draw(screen)
         self.all_buttons.draw(screen)
         self.all_frames.draw(screen)
-        
-    def draw_PiloteUI(self):
-        self.menu_drawn = False
-        
-        #Draw map
-        size_drw = (SCREEN_WIDTH*0.4, SCREEN_HEIGHT*0.8)
-        map_bg = ShapeSprite(self.game,"rect", color = BLACK,size = size_drw)
-        map_bg.rect.topleft = (0.05*SCREEN_WIDTH, 0.125*SCREEN_HEIGHT)
-        if isinstance(self, Inventory):
-            self.make_grid(map_bg, 7,6)      
-        
-        self.all_sprites.add(map_bg)
-        self.all_frames.add(map_bg.generate_frame())
 
 
-        #Draw right menu
-        menu_shape = ShapeSprite(self.game, "rect", color = BLACK, size = size_drw)
-        menu_shape.rect.topright = (0.95*SCREEN_WIDTH, 0.125*SCREEN_HEIGHT)
-        menu_background = menu_shape.generate_frame(Background=True)
-        self.all_sprites.add(menu_background)  
-
-    def make_grid(self,background,row,column):
-        size = background.rect.size
-        square_size = size[0]/column    
-        print("grid")
-        for y in range(row):
-            for x in range(column):
-                square = ShapeSprite(self.game, "rect", color = WHITE, size = (square_size,square_size))
-                square.rect.topleft = (
-                    background.rect.topleft[0]+square_size*x, background.rect.topleft[1]+square_size*y)
-                self.all_frames.add(square.make_square())
-                
-    def draw_inventory_content(self, page_numb, row, column):
-        size = SCREEN_WIDTH*0.4/column
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
-        inventory_sheet = pg.image.load(os.path.join(assets_dir, 'images', 'sprite_sheet', 'inventory.png'))
-        Inventory = self.game.memory.Player["Inventory"]
-        Iron_Ore = pg.Surface.subsurface(inventory_sheet, (24*8,24*3, 24, 24))
-        for y in range(row):
-            for x in range(column):
-                if Inventory[page_numb][y][x] != -1:
-                    square = ShapeSprite(
-                        self.game, "rect", color=BLACK, size=(24, 24))
-                    square.image.fill( (255,255,255,0) )
-                    match Inventory[page_numb][y][x]:
-                        case "Iron Ore":
-                            square.image = Iron_Ore
-                    square.image = pg.transform.scale(square.image, (size, size))
-                    square.image.get_rect()
-                    square.tag = str(x) + '+' + str(y)
-                    square.rect.topleft = (x*24 + 0.05*SCREEN_WIDTH, y*24 + 0.125*SCREEN_HEIGHT)
-                    
-                    
-                    self.all_frames.add(square)
-
-                
-        
 class Intro(State):
     """
     Intro state
@@ -248,7 +187,21 @@ class Pilote(State):
     def boot(self):
         self.game.memory.move_player(list(self.game.memory.Galaxy.stars.values())[0])
         print(list(self.game.memory.Galaxy.stars.keys())[0])
+        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        self.menu_drawn = False
+        
+        #Draw map
+        size_drw = (SCREEN_WIDTH*0.4, SCREEN_HEIGHT*0.8)
+        map_bg = ShapeSprite(self.game,"rect", color = BLACK,size = size_drw)
+        map_bg.rect.topleft = (0.05*SCREEN_WIDTH, 0.125*SCREEN_HEIGHT)
+        self.all_sprites.add(map_bg)
+        self.all_frames.add(map_bg.generate_frame())
 
+        #Draw right menu
+        menu_shape = ShapeSprite(self.game, "rect", color = BLACK, size = size_drw)
+        menu_shape.rect.topright = (0.95*SCREEN_WIDTH, 0.125*SCREEN_HEIGHT)
+        menu_background = menu_shape.generate_frame(Background=True)
+        self.all_sprites.add(menu_background)
         
     def enter(self):
         # when the state becomes the current state
@@ -256,7 +209,6 @@ class Pilote(State):
         self.menu_state = 'main'
         self.menu_page = 0
         self.menu_obj = 0
-        self.draw_PiloteUI()
         print('enter')
 
     def update(self):
@@ -389,8 +341,6 @@ class Pilote(State):
 
                     self.menu_drawn = True
                     
-                    
-
        # check if any key is pressed
         if self.game.input.is_mouse_pressed(1):
                 print("Mouse press")
@@ -410,198 +360,39 @@ class Pilote(State):
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'logs':
                                 print("Logs")    
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'inventory':
-                                self.game.change_state('Inventory')
+                                #self.game.change_state('Outro')
                                 print("Inventory")         
 
                     case 'system':
                         for button in self.all_buttons:
-                            Objects_list = self.game.memory.Galaxy.stars[self.game.memory.Player["System"].name].objects
                             if button.rect.collidepoint(mouse_pos) and button.tag == 'first':
                                 print("first")
-                                self.game.memory.move_player(self.game.memory.Player["System"], obj = Objects_list[self.menu_obj])
-                                self.game.change_state('Surface')
-                                
                             # Check for Option 2
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'second':
                                 print("second")
-                                self.game.memory.move_player(self.game.memory.Player["System"], obj=Objects_list[self.menu_obj + 1])
-                                self.game.change_state('Surface')
-                                
                             # Check for Option 3
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'third':
-                                print("third")
-                                self.game.memory.move_player(
-                                    self.game.memory.Player["System"], obj=Objects_list[self.menu_obj + 2])
-                                self.game.change_state('Surface')
-                                
+                                print("third")    
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'fourth':
                                 #self.game.change_state('Outro')
                                 print("fourth")
-                                self.game.memory.move_player(
-                                    self.game.memory.Player["System"], obj=Objects_list[self.menu_obj + 3])
-                                self.game.change_state('Surface')
-                                
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'back':
                                 print("Back")
                                 self.menu_state = 'main'
                                 self.all_buttons.empty()
                                 self.menu_obj = 0
                                 self.menu_drawn = False
-                                
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'left':
                                 print("Left")
                                 self.all_buttons.empty()
                                 self.menu_drawn = False
                                 self.menu_obj -= 4
-                                
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'right':
                                 print("right")
                                 self.all_buttons.empty()
                                 self.menu_drawn = False
                                 self.menu_obj += 4
-
-class Surface(State):
-    """
-    Surface state
-    """
-
-    def boot(self):
-        print("Surface")
-
-
-    def enter(self):
-        # when the state becomes the current state
-        #set the current submenu to main
-        self.menu_state = 'main'
-        self.menu_square = 0
-        print('surface')
-        self.draw_PiloteUI()
-        print(self.game.memory.Player["Object"].name)
-        
-    def update(self):
-        # on every frame, call the update method of the base class
-        super().update()
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
-        
-       # check which menu is currently display
-        if self.menu_drawn == False:
-            match self.menu_state:
-                case 'main':
-                    # Title button is
-                    title_button = TextSprite(self.game,
-                        os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                        self.game.memory.Player["Object"].name, 12, color = (255,255,255))
-                    size = (SCREEN_WIDTH*0.4*0.9,title_button.rect.h)
-                    title_button.make_button(size)
-                    title_button.rect.centerx = 0.75*SCREEN_WIDTH
-                    title_button.rect.top = 0.15*SCREEN_HEIGHT
-                    self.all_sprites.add(title_button)
-                    
-                    obj = self.game.memory.Player["Object"]
-                    Checkboard = obj.grid
-                    build_button = TextSprite(self.game,
-                            os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                            "Scan surface", 12, color=(255, 255, 255),tag='build')
-                    build_button.make_button(size)
-                    build_button.rect.center = title_button.rect.center
-                    build_button.rect.centery += 0.175*SCREEN_HEIGHT
-                    
-                    leave_button = TextSprite(self.game,
-                        os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                        "Leave orbit", 12, color=(255, 255, 255),tag='leave')
-                    leave_button.make_button(size)
-                    leave_button.rect.center = title_button.rect.center
-                    leave_button.rect.centery += 0.325*SCREEN_HEIGHT
-                    
-                    inventory_button = TextSprite(self.game,
-                        os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                        "Inventory", 12, color=(255, 255, 255),tag='inventory')
-                    inventory_button.make_button(size)
-                    inventory_button.rect.center = title_button.rect.center
-                    inventory_button.rect.centery += 0.475*SCREEN_HEIGHT
-
-                    if obj.populated == True:
-                        trade_button = TextSprite(self.game,
-                            os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                            "Trade", 12, color=(255, 255, 255),tag='trade')
-                        trade_button.make_button(size)
-                        trade_button.rect.center = title_button.rect.center
-                        trade_button.rect.centery += 0.175*SCREEN_HEIGHT
-                        build_button.rect.centery += 0.150*SCREEN_HEIGHT
-                        leave_button.rect.centery += 0.150*SCREEN_HEIGHT
-                        inventory_button.rect.centery += 0.150*SCREEN_HEIGHT
-                        self.all_buttons.add(trade_button)
-                    
-                    self.all_buttons.add(build_button)
-                    self.all_buttons.add(leave_button)
-                    self.all_buttons.add(inventory_button)
-                    self.menu_drawn = True
-                    
-       # check if any key is pressed
-        if self.game.input.is_mouse_pressed(1):
-            print("Mouse press")
-            mouse_pos = pg.mouse.get_pos()
-            # Check if the mouse click is within the region of Option 1
-            for button in self.all_buttons:
-                if button.rect.collidepoint(mouse_pos) and button.tag == 'build':
-                    self.menu_state = 'build'
-                    self.menu_drawn = False
-                    self.all_buttons.empty()
-                    print("Scan surface")
-                # Check for Option 2
-                elif button.rect.collidepoint(mouse_pos) and button.tag == 'leave':
-                    print("Leave orbit")
-                    self.game.change_state('Pilote')
-                # Check for Option 3
-                elif button.rect.collidepoint(mouse_pos) and button.tag == 'inventory':
-                    self.game.change_state('Inventory')
-                elif button.rect.collidepoint(mouse_pos) and button.tag == 'trade':
-                    self.menu_state = 'trade'
-                    self.menu_drawn = False
-                    self.all_buttons.empty()
-                    print("Trade")
-
-class Inventory(State):
-    """
-    Inventory state
-    """
-    def enter(self):
-        # when the state becomes the current state
-        self.menu_state = 'main'
-        self.inventory_page = 0
-        self.menu_square = 0
-        self.draw_PiloteUI()
-        print('inventory')
-        
-    def update(self):
-        # on every frame, call the update method of the base class
-        super().update()
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
-        
-
-        if self.menu_drawn == False:
-            self.draw_inventory_content(self.inventory_page, 7, 6)
-            match self.menu_state:
-                case 'main':
-                    # Title button is
-                    title_button = TextSprite(self.game,
-                        os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                        "Inventory", 12, color = (255,255,255))
-                    size = (SCREEN_WIDTH*0.4*0.9,title_button.rect.h)
-                    title_button.make_button(size)
-                    title_button.rect.centerx = 0.75*SCREEN_WIDTH
-                    title_button.rect.top = 0.15*SCREEN_HEIGHT
-                    self.all_sprites.add(title_button)
-            
-            self.menu_drawn = True  
-        
-        
-        
-
-     
-
-        
-                        
+                                
 class Loading(State):
     """
     Loading screen state (Unused yet)
@@ -620,4 +411,4 @@ class Loading(State):
 # add the states to the __all__ list
 # this is needed so that the states can be imported using the * syntax
 # the first item in the list is the default state
-__all__ = ['Intro', 'Pilote','Surface','Inventory'] #exclude loading
+__all__ = ['Intro', 'Pilote','Loading'] #exclude loading

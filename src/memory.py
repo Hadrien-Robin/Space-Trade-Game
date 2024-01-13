@@ -26,11 +26,7 @@ class Memory:
         self.Business ={}
         self.Player = {}
         self.Galaxy = Galaxy()
-        self.Player.update({"Inventory Size": 1})
-        empty_inv = [[[0 for col in range(6)] for row in range(7)] for page in range(1)]
-        empty_inv[0][0][0] = "Iron Ore"
-        print("Inv: ", len(empty_inv))
-        self.Player.update({"Inventory": empty_inv})
+
     def save(self, file_name):
         print(file_name)
         file_name += '.json'
@@ -55,7 +51,6 @@ class Memory:
         except (IOError,ValueError):
             print("Error: Unable to load game state.")
         
-    def move_player(self,system,obj = ''):
+    def move_player(self,system):
         self.Player.update({"System":system})
-        self.Player.update({"Object": obj})
         
