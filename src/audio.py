@@ -3,6 +3,7 @@ Audio class for loading and playing sounds
 """
 
 import pygame as pg
+import logging 
 
 class Audio:
     """
