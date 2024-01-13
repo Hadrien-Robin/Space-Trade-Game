@@ -27,8 +27,8 @@ class Memory:
         self.Player = {}
         self.Galaxy = Galaxy()
         self.Player.update({"Inventory Size": 1})
-        empty_inv = [[[0 for col in range(6)] for row in range(7)] for page in range(1)]
-        empty_inv[0][0][0] = "Iron Ore"
+        empty_inv = [[[Inventory_Slot() for col in range(6)] for row in range(7)] for page in range(1)]
+        empty_inv[0][0][0].update("Iron Ore",1)
         print("Inv: ", len(empty_inv))
         self.Player.update({"Inventory": empty_inv})
     def save(self, file_name):
@@ -59,3 +59,11 @@ class Memory:
         self.Player.update({"System":system})
         self.Player.update({"Object": obj})
         
+class Inventory_Slot:
+    def __init__(self):
+        self.name = ""
+        self.amount = 0
+        
+    def update(self,new_name,new_amount):
+        self.name = new_name
+        self.amount = new_amount
