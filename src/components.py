@@ -32,6 +32,7 @@ class CustomSprite(pg.sprite.Sprite):
         square.image = slice_sprite(square.image, 7, 7, 1, 7, size[0], size[1])
         square.rect = square.image.get_rect()
         square.rect.center = self.rect.center
+        square.tag = self.tag
         return square
 
 class ImageSprite(CustomSprite):
