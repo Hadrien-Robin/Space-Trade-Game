@@ -24,7 +24,7 @@ class CustomSprite(pg.sprite.Sprite):
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
         if active == True:
             square = ImageSprite(self.game, os.path.join(
-                assets_dir, 'images', 'UI', 'square_A.png'))
+                assets_dir, 'images', 'UI', 'square_A.png'),tag="activated")
         else:
             square = ImageSprite(self.game, os.path.join(
                 assets_dir, 'images', 'UI', 'square_I.png'))
@@ -32,7 +32,8 @@ class CustomSprite(pg.sprite.Sprite):
         square.image = slice_sprite(square.image, 7, 7, 1, 7, size[0], size[1])
         square.rect = square.image.get_rect()
         square.rect.center = self.rect.center
-        square.tag = self.tag
+        if active == False:
+            square.tag = self.tag
         return square
 
 class ImageSprite(CustomSprite):
