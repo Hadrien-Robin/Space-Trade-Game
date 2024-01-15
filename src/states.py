@@ -16,6 +16,8 @@ The State class has the following attributes:
 """
 
 import os
+from re import S
+from tkinter.tix import COLUMN
 import pygame as pg
 from components import *
 from settings import *
@@ -67,6 +69,7 @@ class State:
         self.all_sprites.empty()
         self.all_buttons.empty()
         self.all_frames.empty()
+        
         pass
 
     def draw(self, screen):
@@ -86,8 +89,8 @@ class State:
         map_bg.rect.topleft = (0.05*SCREEN_WIDTH, 0.125*SCREEN_HEIGHT)
         if isinstance(self, Inventory):
             self.make_grid(map_bg, 7,6)      
-        
-        self.all_sprites.add(map_bg)
+        else:
+            self.all_sprites.add(map_bg)
         self.all_frames.add(map_bg.generate_frame())
 
 
@@ -106,11 +109,26 @@ class State:
                 square = ShapeSprite(self.game, "rect", color = WHITE, size = (square_size,square_size))
                 square.rect.topleft = (
                     background.rect.topleft[0]+square_size*x, background.rect.topleft[1]+square_size*y)
-                self.all_frames.add(square.make_square())
+                square.tag = x + column*y
+                self.all_sprites.add(square.make_square())
                 
-    def draw_inventory_content(self, page_numb, row, column):
+    def draw_inventory_content(self, row, column):
+        page_numb = self.inventory_page
+        curr_slot = self.inv_slot
         size = SCREEN_WIDTH*0.4/column
         assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        for sprite in self.all_frames:
+            if sprite.tag == "inv":
+                sprite.kill()   
+
+        x_slot, y_slot = curr_slot
+        for sprite in self.all_sprites:
+            if sprite.tag == 'activated':
+                sprite.kill()
+            if sprite.tag == x_slot + column*y_slot:
+                self.all_sprites.add(sprite.make_square(active = True))
+
+    
         inventory_sheet = pg.image.load(os.path.join(assets_dir, 'images', 'sprite_sheet', 'inventory.png'))
         Inventory = self.game.memory.Player["Inventory"]
         Iron_Ore = pg.Surface.subsurface(inventory_sheet, (24*8,24*3, 24, 24))
@@ -118,20 +136,16 @@ class State:
             for x in range(column):
                 if Inventory[page_numb][y][x] != -1:
                     square = ShapeSprite(
-                        self.game, "rect", color=BLACK, size=(24, 24))
+                        self.game, "rect", color=BLACK, size=(24, 24),tag="inv")
                     square.image.fill( (255,255,255,0) )
-                    match Inventory[page_numb][y][x]:
+                    match Inventory[page_numb][y][x].name:
                         case "Iron Ore":
                             square.image = Iron_Ore
                     square.image = pg.transform.scale(square.image, (size, size))
                     square.image.get_rect()
-                    square.tag = str(x) + '+' + str(y)
-                    square.rect.topleft = (x*24 + 0.05*SCREEN_WIDTH, y*24 + 0.125*SCREEN_HEIGHT)
-                    
-                    
-                    self.all_frames.add(square)
+                    square.rect.topleft = (x*size + 0.05*SCREEN_WIDTH, y*size + 0.125*SCREEN_HEIGHT)
 
-                
+                    self.all_frames.add(square)               
         
 class Intro(State):
     """
@@ -568,6 +582,7 @@ class Inventory(State):
         self.inventory_page = 0
         self.menu_square = 0
         self.draw_PiloteUI()
+        self.inv_slot = [0,0]
         print('inventory')
         
     def update(self):
@@ -577,13 +592,15 @@ class Inventory(State):
         
 
         if self.menu_drawn == False:
-            self.draw_inventory_content(self.inventory_page, 7, 6)
+            Inventory = self.game.memory.Player["Inventory"]
+            self.draw_inventory_content(7, 6)
             match self.menu_state:
                 case 'main':
-                    # Title button is
+                    # Check what is the selected item
+                    text = Inventory[self.inventory_page][self.inv_slot[1]][self.inv_slot[0]].name
                     title_button = TextSprite(self.game,
                         os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
-                        "Inventory", 12, color = (255,255,255))
+                        text, 12, color = (255,255,255))
                     size = (SCREEN_WIDTH*0.4*0.9,title_button.rect.h)
                     title_button.make_button(size)
                     title_button.rect.centerx = 0.75*SCREEN_WIDTH
@@ -591,7 +608,21 @@ class Inventory(State):
                     self.all_sprites.add(title_button)
             
             self.menu_drawn = True  
-                        
+        # check if any key is pressed
+        if self.game.input.is_key_pressed('any'):
+            if self.game.input.is_key_down('left') and self.inv_slot[0] > 0:
+                self.inv_slot[0] -= 1
+                self.menu_drawn = False
+            if self.game.input.is_key_down('right') and self.inv_slot[0] < 5:
+                self.inv_slot[0] += 1
+                self.menu_drawn = False   
+            if self.game.input.is_key_down('up') and self.inv_slot[1] > 0:
+                self.inv_slot[1] -= 1
+                self.menu_drawn = False
+            if self.game.input.is_key_down('down') and self.inv_slot[1] < 6:
+                self.inv_slot[1] += 1
+                self.menu_drawn = False
+
 class Loading(State):
     """
     Loading screen state (Unused yet)
