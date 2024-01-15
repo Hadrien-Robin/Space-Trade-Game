@@ -54,7 +54,7 @@ class Input:
         """
         return button in self.mouse_pressed
 
-    def is_button_down(self, button):
+    def is_mouse_down(self, button):
         """
         Check if a button is down
 
