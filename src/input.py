@@ -41,6 +41,8 @@ class Input:
 
         key: key to check
         """
+        if len(self.keys_pressed) > 0:
+            print(self.keys_pressed)
         if key == 'any':
             return len(self.keys_pressed) > 0
         return key in self.keys_pressed
@@ -78,7 +80,7 @@ class Input:
         if event.type == pgc.KEYDOWN:
             if event.mod == pgc.KMOD_NONE:
                 # If the key is not a modifier key, add the alias to the keys_down set
-                key_name = pgc.key.name(event.key)
+                key_name = pg.key.name(event.key)
                 self.keys_down.add(key_name)
                 self.keys_pressed.add(key_name)
             else:
@@ -92,7 +94,7 @@ class Input:
         if event.type == pgc.KEYUP:
             if event.mod == pgc.KMOD_NONE:
                 # If the key is not a modifier key, remove the alias from the keys_down set
-                key_name = pgc.key.name(event.key)
+                key_name = pg.key.name(event.key)
                 self.keys_down.discard(key_name)
             else:
                 # if the key is a modifier key, remove the alias from the keys_down set
