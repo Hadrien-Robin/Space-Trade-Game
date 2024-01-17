@@ -25,7 +25,7 @@ class Game:
             self.screen = pg.display.set_mode((st.SCREEN_WIDTH,st.SCREEN_HEIGHT))
         
         pg.display.set_caption(st.GAME_TITLE)
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        assets_dir = ressource_path()
 
         
         # clear the screen
