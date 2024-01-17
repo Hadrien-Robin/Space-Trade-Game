@@ -16,8 +16,6 @@ The State class has the following attributes:
 """
 
 import os
-from re import S
-from tkinter.tix import COLUMN
 import pygame as pg
 from components import *
 from settings import *
@@ -605,8 +603,35 @@ class Inventory(State):
                     title_button.make_button(size)
                     title_button.rect.centerx = 0.75*SCREEN_WIDTH
                     title_button.rect.top = 0.15*SCREEN_HEIGHT
+                    
                     self.all_sprites.add(title_button)
-            
+                    
+                    size_arrow = (title_button.rect.h,title_button.rect.h)
+                    if self.inventory_page > 0:
+                        left_arrow = make_arrow(self.game, 'left', size_arrow)
+                        
+                        left_arrow.rect.center = title_button.rect.center
+                        left_arrow.rect.centery += 0.65*SCREEN_HEIGHT
+                        left_arrow.rect.centerx -= 0.625*SCREEN_WIDTH      
+                        
+                        self.all_buttons.add(left_arrow)
+                        
+                    if self.inventory_page < len(Inventory)-1:
+                        print(len(Inventory))
+                        right_arrow = make_arrow(self.game, 'right',size_arrow)
+                        right_arrow.rect.center = title_button.rect.center
+                        right_arrow.rect.centery += 0.65*SCREEN_HEIGHT
+                        right_arrow.rect.centerx -= 0.375*SCREEN_WIDTH
+
+                        self.all_buttons.add(right_arrow)   
+
+                    back_arrow = make_arrow(self.game, 'back',size_arrow)   
+                    back_arrow.rect.center = title_button.rect.center
+                    back_arrow.rect.centery += 0.65*SCREEN_HEIGHT
+                    back_arrow.rect.centerx -= 0.5*SCREEN_WIDTH
+                    
+                    self.all_buttons.add(back_arrow)                    
+
             self.menu_drawn = True  
         # check if any key is pressed
         if self.game.input.is_key_pressed('any'):
@@ -629,6 +654,12 @@ class Inventory(State):
                 if sprite.tag in range(0, 42) and sprite.rect.collidepoint(pos):
                     self.menu_drawn = False
                     self.inv_slot = [sprite.tag % 6, sprite.tag//6]
+            for sprite in self.all_buttons:
+                if sprite.tag == 'back' and sprite.rect.collidepoint(pos):
+                    self.menu_drawn = False
+                    print('back')
+                    self.game.change_state('Pilote')
+                    
 
             
 
