@@ -172,11 +172,7 @@ class System_object:
     def __init__(self,star,obj_type):
         self.type = obj_type
         self.name = star.name
-        self.grid = []
-        self.size = 0
-        self.populated = False
         LETTER_NAME = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o']
-        self.generate_surface()
         if obj_type != "asteroid belt":
             self.name += ' ' + LETTER_NAME[len(star.objects) - sum(1 for Ob in star.objects if Ob.type == "asteroid belt") + 1]
         else:
@@ -185,102 +181,3 @@ class System_object:
                 if it.name == "asteroid belt":
                     self.name += " II"
         print("Generated a(n) ",self.type, " named ", self.name)
-
-    def generate_surface(self):
-        """ Create a dictionnary containing spiraling position on a grid up to 16 squares"""
-
-        pos_register = {'0': [0, 0], '1': [0, 1], '2': [1, 0], '3':[0, -1], '4': [-1, 0],
-                        '5': [-1, 1], '6': [1, 1], '7': [1, -1], '8': [-1, -1], '9': [0, 2],
-                        '10': [2, 0], '11': [0, -2], '12': [-2, 0], '13': [-1, 2], '14': [1, 2],
-                        '15': [2, 1], '16':[2,-1], '17':[1,-2], '18':[-1,-2], '19':[-2,-1],
-                        '20':[-2,1]}
-        if self.type == "rocky planet":
-            self.size = random.randint(2,5)
-            for i in range(0,self.size):
-                square = Square(pos_register[str(i)])
-                rand = random.randint(0, 6)
-                match rand:
-                    case 1:
-                        square.ressource = "ice"
-                    case 2:
-                        square.ressource = "coal"
-                    case 3:
-                        square.ressource = "iron"
-                    case 4:
-                        square.ressource = "oil"
-                    case 5:
-                        square.ressource = "uranium"
-                    case 6:
-                        square.ressource = "titanium"
-                self.grid.append(square)
-            check_pop = random.randint(0, 3)
-            if check_pop == 0:
-                self.populated = True    
-                
-        elif self.type == "gas giant":
-            self.size = random.randint(10,16)
-            for i in range(0, self.size):
-                square = Square(pos_register[str(i)])
-                rand = random.randint(0, 3)
-                match rand:
-                    case 1:
-                        square.ressource = "methane"
-                    case 2:
-                        square.ressource = "helium"
-                    case 3:
-                        square.ressource = "hydrogen"
-                        
-                self.grid.append(square)
-            check_pop = random.randint(0, 6)
-            if check_pop == 0:
-                self.populated = True
-                
-        elif self.type == "icy giant":
-            self.size = random.randint(8,12)
-            for i in range(0, self.size):
-                square = Square(pos_register[str(i)])
-                rand = random.randint(0, 3)
-                match rand:
-                    case 1:
-                        square.ressource = "hydrogen"
-                    case 2:
-                        square.ressource = "methane"
-                    case 3:
-                        square.ressource = "helium"
-
-                self.grid.append(square)
-            check_pop = random.randint(0, 5)
-            if check_pop == 0:
-                self.populated = True
-
-        elif self.type == "asteroid belt":
-            self.size = random.randint(1,3)
-            for i in range(0, self.size):
-                square = Square(pos_register[str(i)])
-                rand = random.randint(0, 3)
-                match rand:
-                    case 1:
-                        square.ressource = "ice"
-                    case 2:
-                        square.ressource = "titanium"
-                    case 3:
-                        square.ressource = "iron"
-                        
-                self.grid.append(square)
-            check_pop = random.randint(0, 9)
-            if check_pop == 0:
-                self.populated = True
-        
-        if self.populated:
-            self.grid[0].content = 'settlement'
-            
-class Square:
-    def __init__(self,pos):
-        
-        self.content = -1
-        self.ressource = -1
-        
-        self.position = pos
-        
-
-        
