@@ -116,7 +116,7 @@ class State:
         page_numb = self.inventory_page
         curr_slot = self.inv_slot
         size = SCREEN_WIDTH*0.4/column
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        assets_dir = ressource_path()
         for sprite in self.all_frames:
             if sprite.tag == "inv":
                 sprite.kill()   
@@ -152,7 +152,7 @@ class Intro(State):
     Intro state
     """
     def boot(self):
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        assets_dir = ressource_path()
         # load the intro sound
         self.game.audio.load_sound('intro', os.path.join(assets_dir, 'sounds', 'start_screen_st.mp3'))
 
@@ -273,7 +273,7 @@ class Pilote(State):
     def update(self):
         # on every frame, call the update method of the base class
         super().update()
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        assets_dir = ressource_path()
         
        # check which menu is currently display
         if self.menu_drawn == False:
@@ -492,7 +492,7 @@ class Surface(State):
     def update(self):
         # on every frame, call the update method of the base class
         super().update()
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        assets_dir = ressource_path()
         
        # check which menu is currently display
         if self.menu_drawn == False:
@@ -588,7 +588,7 @@ class Inventory(State):
     def update(self):
         # on every frame, call the update method of the base class
         super().update()
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        assets_dir = ressource_path()
         
 
         if self.menu_drawn == False:
@@ -622,13 +622,22 @@ class Inventory(State):
             if self.game.input.is_key_down('down') and self.inv_slot[1] < 6:
                 self.inv_slot[1] += 1
                 self.menu_drawn = False
+        
+        if self.game.input.is_mouse_pressed(1):
+            pos = pg.mouse.get_pos()
+            for sprite in self.all_sprites:
+                if sprite.tag in range(0, 42) and sprite.rect.collidepoint(pos):
+                    self.menu_drawn = False
+                    self.inv_slot = [sprite.tag % 6, sprite.tag//6]
+
+            
 
 class Loading(State):
     """
     Loading screen state (Unused yet)
     """
     def boot(self):
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        assets_dir = ressource_path()
         # add the loading text
         text = TextSprite(self.game,
                 os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
