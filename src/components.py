@@ -4,11 +4,20 @@ This file contains the classes for the components of the game
 
 import pygame as pg
 import os
+import sys
+
+def ressource_path():
+    try:
+        base_path = sys._MEIPASS
+    except AttributeError:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path, "assets")
 
 class CustomSprite(pg.sprite.Sprite):
     
     def generate_frame(self, Background = False):
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        assets_dir = ressource_path()
         if Background == False:
             frame = ImageSprite(self.game, os.path.join(assets_dir, 'images','UI', 'frame_map.png'))
         elif Background == True:
@@ -21,7 +30,7 @@ class CustomSprite(pg.sprite.Sprite):
         return frame
     
     def make_square(self,active=False):
-        assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+        assets_dir = ressource_path()
         if active == True:
             square = ImageSprite(self.game, os.path.join(
                 assets_dir, 'images', 'UI', 'square_A.png'),tag="activated")
@@ -211,7 +220,7 @@ def slice_sprite(sprite, left, right, top, bottom, width, height, draw_mode="SLI
     return sliced_sprite
 
 def make_arrow(game, direction, size):
-    assets_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'assets'))
+    assets_dir = ressource_path()
     button = ImageSprite(game, os.path.join(assets_dir, 'images', 'UI', direction+'.png'), tag=direction)
     button.image = slice_sprite(button.image, 34, 34, 29, 39, 1.5*size[0],1.5*size[1])
     button.image.set_colorkey((0,0,0))
