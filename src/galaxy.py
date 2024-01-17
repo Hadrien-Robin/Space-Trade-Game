@@ -15,6 +15,7 @@ The Galaxy class has the following attributes:
 import random
 import os
 import math
+from components import ressource_path
 
 
 
@@ -36,7 +37,7 @@ class Galaxy:
     def generate(self):
         ALPHA = 1       #this control the distance impact on the probabily of having a pathway between two stars.
         MIN_DIST = 0.5  #minimum distance between two stars
-        database_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'database'))
+        database_dir = os.path.abspath(os.path.join(ressource_path(), '..', 'database'))
         names_list = set(line.strip() for line in open(os.path.join(database_dir,'star_names.txt')))
 
         crd_so_far = []
