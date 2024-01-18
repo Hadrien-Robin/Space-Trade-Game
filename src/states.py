@@ -86,7 +86,9 @@ class State:
         map_bg = ShapeSprite(self.game,"rect", color = BLACK,size = size_drw)
         map_bg.rect.topleft = (0.05*SCREEN_WIDTH, 0.125*SCREEN_HEIGHT)
         if isinstance(self, Inventory):
-            self.make_grid(map_bg, 7,6)      
+            self.make_grid(map_bg, 7,6)
+        elif isinstance(self, Surface):
+            self.make_surface(map_bg)
         else:
             self.all_sprites.add(map_bg)
         self.all_frames.add(map_bg.generate_frame())
@@ -102,6 +104,7 @@ class State:
         size = background.rect.size
         square_size = size[0]/column    
         print("grid")
+        
         for y in range(row):
             for x in range(column):
                 square = ShapeSprite(self.game, "rect", color = WHITE, size = (square_size,square_size))
@@ -110,6 +113,48 @@ class State:
                 square.tag = x + column*y
                 self.all_sprites.add(square.make_square())
                 
+    def make_surface(self, background):
+        size = background.rect.size
+        square_size = size[0]/5
+        print("surface")
+
+        match self.game.memory.Player["Object"].type:
+            case "gas giant":
+                file_name = "GasGiant" + str(random.randint(1,2)) + ".png"
+            case "rocky planet":
+                file_name = "Rocky" + str(random.randint(1, 6)) + ".png"
+            case "icy giant":
+                file_name = "IcyGiant" + str(random.randint(1, 2)) + ".png"
+            case "asteroid belt":
+                file_name = "Asteroid" + ".png"
+                
+        planet = ImageSprite(self.game, os.path.join(
+            ressource_path(), 'images', file_name))
+        planet.image = pg.transform.scale(planet.image, (background.rect.w,background.rect.w))
+        if self.game.memory.Player["Object"].type == "rocky planet":
+            planet.image = pg.transform.scale_by(planet.image,0.5)
+        elif self.game.memory.Player["Object"].type == "asteroid belt":
+            planet.image = pg.transform.scale_by(planet.image, 0.3)
+        elif self.game.memory.Player["Object"].type == "gas giant":
+            planet.image = pg.transform.scale_by(planet.image, 2)
+        planet.rect = planet.image.get_rect()
+        planet.rect.center = background.rect.center
+        self.all_sprites.add(planet)
+        
+
+
+        for sq in self.game.memory.Player["Object"].grid:
+            x,y = sq.position    
+            square = ShapeSprite(self.game, "rect", color = WHITE, size = (square_size,square_size))
+            square.rect.center = (
+            background.rect.center[0]+square_size*x, background.rect.center[1]+square_size*y)
+            square.tag = x + 5*y
+            square = square.make_square()
+            square.image.set_alpha(200)
+            
+            self.all_sprites.add(square)
+        
+        
     def draw_inventory_content(self, row, column):
         page_numb = self.inventory_page
         curr_slot = self.inv_slot
@@ -256,6 +301,7 @@ class Pilote(State):
     """
     def boot(self):
         self.game.memory.move_player(list(self.game.memory.Galaxy.stars.values())[0])
+        self.game.memory.set_home_system()
         print(list(self.game.memory.Galaxy.stars.keys())[0])
 
         
