@@ -191,8 +191,10 @@ class System_object:
     def __init__(self,star,obj_type):
         self.type = obj_type
         self.name = star.name
+        self.permit = False
         self.grid = []
         self.size = 0
+        self.image_id = None
         self.populated = False
         LETTER_NAME = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o']
         self.generate_surface()
@@ -220,17 +222,17 @@ class System_object:
                 rand = random.randint(0, 6)
                 match rand:
                     case 1:
-                        square.ressource = "ice"
+                        square.ressource = "Ice"
                     case 2:
-                        square.ressource = "coal"
+                        square.ressource = "Coal"
                     case 3:
-                        square.ressource = "iron"
+                        square.ressource = "Iron"
                     case 4:
-                        square.ressource = "oil"
+                        square.ressource = "Oil"
                     case 5:
-                        square.ressource = "uranium"
+                        square.ressource = "Uranium"
                     case 6:
-                        square.ressource = "titanium"
+                        square.ressource = "Titanium"
                 self.grid.append(square)
             check_pop = random.randint(0, 3)
             if check_pop == 0:
@@ -243,11 +245,11 @@ class System_object:
                 rand = random.randint(0, 3)
                 match rand:
                     case 1:
-                        square.ressource = "methane"
+                        square.ressource = "Methane"
                     case 2:
-                        square.ressource = "helium"
+                        square.ressource = "Helium"
                     case 3:
-                        square.ressource = "hydrogen"
+                        square.ressource = "Hydrogen"
                         
                 self.grid.append(square)
             check_pop = random.randint(0, 6)
@@ -261,11 +263,11 @@ class System_object:
                 rand = random.randint(0, 3)
                 match rand:
                     case 1:
-                        square.ressource = "hydrogen"
+                        square.ressource = "Hydrogen"
                     case 2:
-                        square.ressource = "methane"
+                        square.ressource = "Methane"
                     case 3:
-                        square.ressource = "helium"
+                        square.ressource = "Helium"
 
                 self.grid.append(square)
             check_pop = random.randint(0, 5)
@@ -279,11 +281,11 @@ class System_object:
                 rand = random.randint(0, 3)
                 match rand:
                     case 1:
-                        square.ressource = "ice"
+                        square.ressource = "Ice"
                     case 2:
-                        square.ressource = "titanium"
+                        square.ressource = "Titanium"
                     case 3:
-                        square.ressource = "iron"
+                        square.ressource = "Iron"
                         
                 self.grid.append(square)
             check_pop = random.randint(0, 9)
