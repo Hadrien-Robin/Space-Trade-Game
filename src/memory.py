@@ -15,6 +15,7 @@ The Memory class has the following attributes:
 import os
 import json
 from galaxy import Galaxy
+from random import randint  
 
 class Memory:
     """
@@ -31,6 +32,7 @@ class Memory:
         empty_inv[0][0][0].update("Iron Ore",1)
         print("Inv: ", len(empty_inv))
         self.Player.update({"Inventory": empty_inv})
+        
     def save(self, file_name):
         print(file_name)
         file_name += '.json'
@@ -57,8 +59,24 @@ class Memory:
         
     def move_player(self,system,obj = ''):
         self.Player.update({"System":system})
+        if obj != '' and len(obj.grid) == 0:
+            obj.generate_surface()    
         self.Player.update({"Object": obj})
         
+
+    def set_home_system(self):
+        if self.Player['Object'] == '':
+            Obj_list = self.Player['System'].objects
+            Obj_list = [obj for obj in Obj_list if obj.type == 'rocky planet']
+            if Obj_list == []:
+                Obj = self.Player['System'].objects[0]
+            else:
+                Obj = Obj_list[randint(0, len(Obj_list)-1)]
+        else:
+            Obj = self.Player['Object']
+        self.Player.update({"Home":[self.Player['System'],Obj]})
+        
+
 class Inventory_Slot:
     def __init__(self):
         self.name = ""
