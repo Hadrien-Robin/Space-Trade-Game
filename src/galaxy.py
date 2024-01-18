@@ -183,7 +183,7 @@ class System_object:
                     self.name += " II"
         print("Generated a(n) ",self.type, " named ", self.name)
         
-   class System_object:
+class System_object:
     """
     System objects class
     """
