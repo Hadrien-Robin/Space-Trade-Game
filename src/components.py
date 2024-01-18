@@ -37,6 +37,7 @@ class CustomSprite(pg.sprite.Sprite):
         else:
             square = ImageSprite(self.game, os.path.join(
                 assets_dir, 'images', 'UI', 'square_I.png'))
+        square.image.convert_alpha()
         size = self.rect.size
         square.image = slice_sprite(square.image, 7, 7, 1, 7, size[0], size[1])
         square.rect = square.image.get_rect()
