@@ -89,6 +89,8 @@ class State:
             self.make_grid(map_bg, 7,6)
         elif isinstance(self, Surface):
             self.make_surface(map_bg)
+            if self.menu_state == "build":
+                self.draw_surface_content(map_bg)
         else:
             self.all_sprites.add(map_bg)
         self.all_frames.add(map_bg.generate_frame())
@@ -120,11 +122,26 @@ class State:
 
         match self.game.memory.Player["Object"].type:
             case "gas giant":
-                file_name = "GasGiant" + str(random.randint(1,2)) + ".png"
+                if self.game.memory.Player["Object"].image_id == None:
+                    image_numb = random.randint(1,2)
+                else:
+                    image_numb = self.game.memory.Player["Object"].image_id 
+                file_name = "GasGiant" + str(image_numb) + ".png"
+                self.game.memory.Player["Object"].image_id = image_numb
             case "rocky planet":
-                file_name = "Rocky" + str(random.randint(1, 6)) + ".png"
+                if self.game.memory.Player["Object"].image_id == None:
+                    image_numb = random.randint(1, 6)
+                else:
+                    image_numb = self.game.memory.Player["Object"].image_id 
+                file_name = "Rocky" + str(image_numb) + ".png"
+                self.game.memory.Player["Object"].image_id = image_numb
             case "icy giant":
-                file_name = "IcyGiant" + str(random.randint(1, 2)) + ".png"
+                if self.game.memory.Player["Object"].image_id == None:
+                    image_numb = random.randint(1, 2)
+                else:
+                    image_numb = self.game.memory.Player["Object"].image_id 
+                file_name = "IcyGiant" + str(image_numb) + ".png"
+                self.game.memory.Player["Object"].image_id = image_numb
             case "asteroid belt":
                 file_name = "Asteroid" + ".png"
                 
@@ -140,20 +157,34 @@ class State:
         planet.rect = planet.image.get_rect()
         planet.rect.center = background.rect.center
         self.all_sprites.add(planet)
-        
 
 
-        for sq in self.game.memory.Player["Object"].grid:
-            x,y = sq.position    
-            square = ShapeSprite(self.game, "rect", color = WHITE, size = (square_size,square_size))
-            square.rect.center = (
-            background.rect.center[0]+square_size*x, background.rect.center[1]+square_size*y)
-            square.tag = x + 5*y
-            square = square.make_square()
-            square.image.set_alpha(200)
-            
-            self.all_sprites.add(square)
-        
+    def Gen_Inv_Dict(self, inventory_sheet, surface = False):
+        Iron_Ore = pg.Surface.subsurface(inventory_sheet, (24*8,24*3, 24, 24))
+        Iron_Nugget = pg.Surface.subsurface(inventory_sheet, (24*8, 24*4, 24, 24))
+        Iron_Ingot = pg.Surface.subsurface(inventory_sheet, (24*8, 24*5, 24, 24))
+
+        Titanium_Ore = pg.Surface.subsurface(inventory_sheet, (24*1, 24*3, 24, 24))
+        Titanium_Nugget = pg.Surface.subsurface(inventory_sheet, (24*1, 24*4, 24, 24))
+        Titanium_Ingot = pg.Surface.subsurface(inventory_sheet, (24*1, 24*5, 24, 24))
+
+        Uranium_Ore = pg.Surface.subsurface(inventory_sheet, (24*7, 24*3, 24, 24))
+        Uranium_Nugget = pg.Surface.subsurface(inventory_sheet, (24*7, 24*4, 24, 24))
+        Uranium_Ingot = pg.Surface.subsurface(inventory_sheet, (24*7, 24*5, 24, 24))
+
+        Ice = pg.Surface.subsurface(inventory_sheet, (24*5, 24*2, 24, 24))
+        Coal = pg.Surface.subsurface(inventory_sheet, (24*4, 24*0, 24, 24))
+        Oil = pg.Surface.subsurface(inventory_sheet, (24*10, 24*10, 24, 24))
+        Water = pg.Surface.subsurface(inventory_sheet, (24*2, 24*10, 24, 24))
+        if surface:
+            Dict = {'Iron': Iron_Ore, 'Titanium': Titanium_Ore, 'Uranium': Uranium_Ore,
+                    'Ice': Ice, 'Coal': Coal, 'Oil': Oil, 'Water': Water}
+        else:
+            Dict = {'Iron Ore':Iron_Ore,'Iron Nugget':Iron_Nugget,'Iron Ingot':Iron_Ingot,
+                'Titanium Ore': Titanium_Ore, 'Titanium Nugget': Titanium_Nugget, 'Titanium Ingot': Titanium_Ingot,
+                'Uranium Ore': Uranium_Ore, 'Uranium Nugget': Uranium_Nugget, 'Uranium Ingot': Uranium_Ingot,
+                'Ice': Ice, 'Coal': Coal, 'Oil': Oil, 'Water': Water}
+        return Dict        
         
     def draw_inventory_content(self, row, column):
         page_numb = self.inventory_page
@@ -174,22 +205,52 @@ class State:
     
         inventory_sheet = pg.image.load(os.path.join(assets_dir, 'images', 'sprite_sheet', 'inventory.png'))
         Inventory = self.game.memory.Player["Inventory"]
-        Iron_Ore = pg.Surface.subsurface(inventory_sheet, (24*8,24*3, 24, 24))
+
+        SpriteDict = self.Gen_Inv_Dict(inventory_sheet)
+  
         for y in range(row):
             for x in range(column):
-                if Inventory[page_numb][y][x] != -1:
+                if Inventory[page_numb][y][x].name != "":
                     square = ShapeSprite(
                         self.game, "rect", color=BLACK, size=(24, 24),tag="inv")
                     square.image.fill( (255,255,255,0) )
-                    match Inventory[page_numb][y][x].name:
-                        case "Iron Ore":
-                            square.image = Iron_Ore
+                    square.image = SpriteDict[Inventory[page_numb][y][x].name]
                     square.image = pg.transform.scale(square.image, (size, size))
                     square.image.get_rect()
                     square.rect.topleft = (x*size + 0.05*SCREEN_WIDTH, y*size + 0.125*SCREEN_HEIGHT)
 
-                    self.all_frames.add(square)               
-        
+                    self.all_frames.add(square)   
+                    
+    def draw_surface_content(self,background):
+        inventory_sheet = pg.image.load(os.path.join(ressource_path(), 'images', 'sprite_sheet', 'inventory.png'))
+        Surface = self.game.memory.Player["Object"].grid
+        ResDict = self.Gen_Inv_Dict(inventory_sheet,surface = True)
+        size = SCREEN_WIDTH*0.4/5
+
+        for sq in Surface:
+            x,y = sq.position
+            square = ShapeSprite(self.game, "rect", color = WHITE, size = (size,size))
+            square.rect.center = (
+            background.rect.center[0]+size*x, background.rect.center[1]+size*y)
+            square.tag = x + 5*y
+            square = square.make_square()
+            square.image.set_alpha(200)
+            self.all_buttons.add(square)    
+            
+        for sq in Surface: 
+            x,y = sq.position   
+            if sq.content != -1:
+                print("Ha!")
+            elif sq.ressource in ResDict:
+                square = ShapeSprite(
+                        self.game, "rect", color=BLACK, size=(24, 24),tag="map")
+                square.image.fill( (255,255,255,0) )
+                square.image = ResDict[sq.ressource]
+                square.image = pg.transform.scale(square.image, (size, size))
+                square.rect = square.image.get_rect()
+                square.rect.center = (background.rect.center[0]+size*x, background.rect.center[1]+size*y)
+                self.all_buttons.add(square) 
+    
 class Intro(State):
     """
     Intro state
@@ -540,6 +601,7 @@ class Surface(State):
         
        # check which menu is currently display
         if self.menu_drawn == False:
+            self.draw_PiloteUI()
             match self.menu_state:
                 case 'main':
                     # Title button is
@@ -590,8 +652,18 @@ class Surface(State):
                     self.all_buttons.add(build_button)
                     self.all_buttons.add(leave_button)
                     self.all_buttons.add(inventory_button)
-                    self.menu_drawn = True
-                    
+
+                case 'build':
+                     # Title button is
+                    title_button = TextSprite(self.game,
+                        os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                        self.game.memory.Player["Object"].name, 12, color = (255,255,255))
+                    size = (SCREEN_WIDTH*0.4*0.9,title_button.rect.h)
+                    title_button.make_button(size)
+                    title_button.rect.centerx = 0.75*SCREEN_WIDTH
+                    title_button.rect.top = 0.15*SCREEN_HEIGHT
+                    self.all_sprites.add(title_button)
+            self.menu_drawn = True
        # check if any key is pressed
         if self.game.input.is_mouse_pressed(1):
             print("Mouse press")
