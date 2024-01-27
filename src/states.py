@@ -226,17 +226,33 @@ class State:
         Surface = self.game.memory.Player["Object"].grid
         ResDict = self.Gen_Inv_Dict(inventory_sheet,surface = True)
         size = SCREEN_WIDTH*0.4/5
-
+        for sprite in self.all_frames:
+            if sprite.tag == "map":
+                sprite.kill()   
+                
         for sq in Surface:
             x,y = sq.position
             square = ShapeSprite(self.game, "rect", color = WHITE, size = (size,size))
-            square.rect.center = (
-            background.rect.center[0]+size*x, background.rect.center[1]+size*y)
+            square.rect.topleft = (
+            background.rect.topleft[0]+size*(x-1), background.rect.center[1]-(background.rect.w)/2 + size*(y-1))
             square.tag = x + 5*y
             square = square.make_square()
             square.image.set_alpha(200)
-            self.all_buttons.add(square)    
+            self.all_sprites.add(square)
             
+        pos_register = {'0': [3, 3], '1': [3, 4], '2': [4, 3], '3':[3, 2], '4': [2, 3],
+                        '5': [2, 4], '6': [4, 4], '7': [4, 2], '8': [2, 2], '9': [3, 5],
+                        '10': [5, 3], '11': [3, 1], '12': [1, 3], '13': [2, 5], '14': [4, 5],
+                        '15': [5, 4], '16':[5,2], '17':[4,1], '18':[2,1], '19':[1,2],
+                        '20':[1,4]}
+        
+        x_slot, y_slot = pos_register[str(self.selected_square)]
+        for sprite in self.all_sprites:
+            if sprite.tag == 'activated':
+                sprite.kill()
+            if sprite.tag == x_slot + 5*y_slot:
+                self.all_sprites.add(sprite.make_square(active = True)) 
+                
         for sq in Surface: 
             x,y = sq.position   
             if sq.content != -1:
@@ -248,8 +264,8 @@ class State:
                 square.image = ResDict[sq.ressource]
                 square.image = pg.transform.scale(square.image, (size, size))
                 square.rect = square.image.get_rect()
-                square.rect.center = (background.rect.center[0]+size*x, background.rect.center[1]+size*y)
-                self.all_buttons.add(square) 
+                square.rect.topleft = (background.rect.topleft[0]+size*(x-1), background.rect.center[1]-(background.rect.w)/2 + size*(y-1))
+                self.all_sprites.add(square) 
     
 class Intro(State):
     """
@@ -590,6 +606,7 @@ class Surface(State):
         #set the current submenu to main
         self.menu_state = 'main'
         self.menu_square = 0
+        self.selected_square = 0
         print('surface')
         self.draw_PiloteUI()
         print(self.game.memory.Player["Object"].name)
@@ -598,9 +615,18 @@ class Surface(State):
         # on every frame, call the update method of the base class
         super().update()
         assets_dir = ressource_path()
+        obj = self.game.memory.Player["Object"]
         
+        pos_register = {'0': [3, 3], '1': [3, 4], '2': [4, 3], '3':[3, 2], '4': [2, 3],
+                        '5': [2, 4], '6': [4, 4], '7': [4, 2], '8': [2, 2], '9': [3, 5],
+                        '10': [5, 3], '11': [3, 1], '12': [1, 3], '13': [2, 5], '14': [4, 5],
+                        '15': [5, 4], '16':[5,2], '17':[4,1], '18':[2,1], '19':[1,2],
+                        '20':[1,4]}
        # check which menu is currently display
         if self.menu_drawn == False:
+
+            square = obj.grid[self.selected_square]           
+
             self.draw_PiloteUI()
             match self.menu_state:
                 case 'main':
@@ -613,8 +639,7 @@ class Surface(State):
                     title_button.rect.centerx = 0.75*SCREEN_WIDTH
                     title_button.rect.top = 0.15*SCREEN_HEIGHT
                     self.all_sprites.add(title_button)
-                    
-                    obj = self.game.memory.Player["Object"]
+                   
                     Checkboard = obj.grid
                     build_button = TextSprite(self.game,
                             os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
@@ -663,30 +688,51 @@ class Surface(State):
                     title_button.rect.centerx = 0.75*SCREEN_WIDTH
                     title_button.rect.top = 0.15*SCREEN_HEIGHT
                     self.all_sprites.add(title_button)
+
             self.menu_drawn = True
        # check if any key is pressed
         if self.game.input.is_mouse_pressed(1):
             print("Mouse press")
             mouse_pos = pg.mouse.get_pos()
-            # Check if the mouse click is within the region of Option 1
-            for button in self.all_buttons:
-                if button.rect.collidepoint(mouse_pos) and button.tag == 'build':
-                    self.menu_state = 'build'
-                    self.menu_drawn = False
-                    self.all_buttons.empty()
-                    print("Scan surface")
-                # Check for Option 2
-                elif button.rect.collidepoint(mouse_pos) and button.tag == 'leave':
-                    print("Leave orbit")
-                    self.game.change_state('Pilote')
-                # Check for Option 3
-                elif button.rect.collidepoint(mouse_pos) and button.tag == 'inventory':
-                    self.game.change_state('Inventory')
-                elif button.rect.collidepoint(mouse_pos) and button.tag == 'trade':
-                    self.menu_state = 'trade'
-                    self.menu_drawn = False
-                    self.all_buttons.empty()
-                    print("Trade")
+            if self.menu_state == 'main':
+                # Check if the mouse click is within the region of Option 1
+                for button in self.all_buttons:
+                    if button.rect.collidepoint(mouse_pos) and button.tag == 'build':
+                        self.menu_state = 'build'
+                        self.menu_drawn = False
+                        self.all_buttons.empty()
+                        print("Scan surface")
+                    # Check for Option 2
+                    elif button.rect.collidepoint(mouse_pos) and button.tag == 'leave':
+                        print("Leave orbit")
+                        self.game.change_state('Pilote')
+                    # Check for Option 3
+                    elif button.rect.collidepoint(mouse_pos) and button.tag == 'inventory':
+                        self.game.change_state('Inventory')
+                    elif button.rect.collidepoint(mouse_pos) and button.tag == 'trade':
+                        self.menu_state = 'trade'
+                        self.menu_drawn = False
+                        self.all_buttons.empty()
+                        print("Trade")
+
+            if self.menu_state == 'build':
+                for sprite in self.all_sprites:
+                        if sprite.tag in range(31) and sprite.rect.collidepoint(mouse_pos):
+                            self.menu_drawn = False
+                            pair = [int(sprite.tag)%5, int(sprite.tag) // 5]
+                            if pair[0] == 0:
+                                    pair[0] = 5
+                                    pair[1] -= 1
+                            key = [key for key, value in pos_register.items() if value == pair][0]
+                            self.selected_square = int(key)
+                            print(key)
+                            
+                for sprite in self.all_buttons:
+                        if sprite.tag == 'back' and sprite.rect.collidepoint(mouse_pos):
+                            self.menu_drawn = False
+                            print('back')
+                            self.game.change_state('Pilote')
+
 
 class Inventory(State):
     """

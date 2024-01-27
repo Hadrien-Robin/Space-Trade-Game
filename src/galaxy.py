@@ -196,7 +196,7 @@ class System_object:
         self.size = 0
         self.image_id = None
         self.populated = False
-        LETTER_NAME = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o']
+        LETTER_NAME = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p']
         self.generate_surface()
         if obj_type != "asteroid belt":
             self.name += ' ' + LETTER_NAME[len(star.objects) - sum(1 for Ob in star.objects if Ob.type == "asteroid belt") + 1]
@@ -208,13 +208,13 @@ class System_object:
         print("Generated a(n) ",self.type, " named ", self.name)
 
     def generate_surface(self):
-        """ Create a dictionnary containing spiraling position on a grid up to 16 squares"""
+        """ Create a dictionnary containing spiraling position on a grid up to 21 squares"""
 
-        pos_register = {'0': [0, 0], '1': [0, 1], '2': [1, 0], '3':[0, -1], '4': [-1, 0],
-                        '5': [-1, 1], '6': [1, 1], '7': [1, -1], '8': [-1, -1], '9': [0, 2],
-                        '10': [2, 0], '11': [0, -2], '12': [-2, 0], '13': [-1, 2], '14': [1, 2],
-                        '15': [2, 1], '16':[2,-1], '17':[1,-2], '18':[-1,-2], '19':[-2,-1],
-                        '20':[-2,1]}
+        pos_register = {'0': [3, 3], '1': [3, 4], '2': [4, 3], '3':[3, 2], '4': [2, 3],
+                        '5': [2, 4], '6': [4, 4], '7': [4, 2], '8': [2, 2], '9': [3, 5],
+                        '10': [5, 3], '11': [3, 1], '12': [1, 3], '13': [2, 5], '14': [4, 5],
+                        '15': [5, 4], '16':[5,2], '17':[4,1], '18':[2,1], '19':[1,2],
+                        '20':[1,4]}
         if self.type == "rocky planet":
             self.size = random.randint(2,5)
             for i in range(0,self.size):
