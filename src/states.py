@@ -688,7 +688,14 @@ class Surface(State):
                     title_button.rect.centerx = 0.75*SCREEN_WIDTH
                     title_button.rect.top = 0.15*SCREEN_HEIGHT
                     self.all_sprites.add(title_button)
-
+                    
+                    size_arrow = (title_button.rect.h,title_button.rect.h)
+                    back_arrow = make_arrow(self.game, 'back',size_arrow)   
+                    back_arrow.rect.center = title_button.rect.center
+                    back_arrow.rect.centery += 0.65*SCREEN_HEIGHT
+                    back_arrow.rect.centerx -= 0.5*SCREEN_WIDTH
+                    self.all_buttons.add(back_arrow)
+                    
             self.menu_drawn = True
        # check if any key is pressed
         if self.game.input.is_mouse_pressed(1):
@@ -731,7 +738,11 @@ class Surface(State):
                         if sprite.tag == 'back' and sprite.rect.collidepoint(mouse_pos):
                             self.menu_drawn = False
                             print('back')
-                            self.game.change_state('Pilote')
+                            self.menu_state = 'main'
+                            for spr in self.all_sprites:
+                                if spr.tag in range(31) or spr.tag == 'activated' or spr.tag == 'map':
+                                    self.all_sprites.remove(spr)
+                            self.all_buttons.empty()
 
 
 class Inventory(State):
