@@ -21,6 +21,7 @@ from components import *
 from settings import *
 import memory as mry
 import random 
+from event import *
 
 class State:
     """
@@ -538,6 +539,7 @@ class Pilote(State):
                             # Check for Option 2
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'travel':
                                 print("Travel")
+                                self.game.change_state('Traveling')
                             # Check for Option 3
                             elif button.rect.collidepoint(mouse_pos) and button.tag == 'logs':
                                 print("Logs")    
@@ -744,7 +746,25 @@ class Surface(State):
                                     self.all_sprites.remove(spr)
                             self.all_buttons.empty()
 
+class Traveling(State):
+    """
+    Traveling state
+    """
+    def enter(self):
+        self.Event = Event(self.game)
+        self.draw_PiloteUI()
+        print('Traveling')
+        self.selectEvent()
+        print(self.Event.number)
+        
+    def update(self):
+        super().update()
 
+    def selectEvent(self):
+        self.Event.number = random.randint(1,EventCount)
+        self.Event.load_event()
+        print(self.Event.description)
+    
 class Inventory(State):
     """
     Inventory state
@@ -856,4 +876,4 @@ class Loading(State):
 # add the states to the __all__ list
 # this is needed so that the states can be imported using the * syntax
 # the first item in the list is the default state
-__all__ = ['Intro', 'Pilote','Surface','Inventory'] #exclude loading
+__all__ = ['Intro', 'Pilote','Surface','Inventory','Traveling'] #exclude loading
