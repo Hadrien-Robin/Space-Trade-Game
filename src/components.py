@@ -5,6 +5,7 @@ This file contains the classes for the components of the game
 import pygame as pg
 import os
 import sys
+import math 
 
 def ressource_path():
     try:
@@ -65,8 +66,6 @@ class ImageSprite(CustomSprite):
         # get the rect
         self.rect = self.image.get_rect()
         self.tag = tag
-        
-
     
 class ShapeSprite(CustomSprite):
     """
@@ -86,7 +85,7 @@ class ShapeSprite(CustomSprite):
             self.image.fill(color)
 
         # get the rect
-        self.rect = self.image.get_rect()
+        self.rect = self.image.get_rect() 
         self.tag = tag
     
 class TextSprite(pg.sprite.Sprite):
@@ -227,4 +226,38 @@ def make_arrow(game, direction, size):
     button.image.set_colorkey((0,0,0))
     button.rect = button.image.get_rect()
     return button
+
+
+#Adapted from galatolofederico @Github 
+def blit_text(surface, text, pos, font, color=pg.Color('white')):
+    words = [word.split(' ') for word in text.splitlines()] 
+    space = font.size(' ')[0]
+    max_width, max_height = surface.get_width(), surface.get_height()
+    x, y = pos
+    rects = []
+    row_rects = []
+    for line in words:
+        for word in line:
+            word_surface = font.render(word, 0, color)
+            word_width, word_height = word_surface.get_size()
+            if x + word_width >= max_width:
+                x = pos[0]
+                rects.append(row_rects)
+                row_rects = []
+            row_rects.append(word)
+            x += word_width + space
+        x = pos[0]
+        rects.append(row_rects)
+        row_rects = []
+
+    max_vertical_rects = math.floor(max_height / font.size(' ')[1])
+    printable_rects = rects[-max_vertical_rects:]
+    for line in printable_rects:
+        for word in line:
+            word_surface = font.render(word, 0, color)
+            word_width, word_height = word_surface.get_size()
+            surface.blit(word_surface, (x, y))
+            x += word_width + space
+        x = pos[0]
+        y += word_height*1.1
     
