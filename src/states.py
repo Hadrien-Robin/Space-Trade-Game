@@ -84,7 +84,7 @@ class State:
         
         #Draw map
         size_drw = (SCREEN_WIDTH*0.4, SCREEN_HEIGHT*0.8)
-        map_bg = ShapeSprite(self.game,"rect", color = BLACK,size = size_drw)
+        map_bg = ShapeSprite(self.game,"rect", color = BLACK,size = size_drw,tag="map")
         map_bg.rect.topleft = (0.05*SCREEN_WIDTH, 0.125*SCREEN_HEIGHT)
         if isinstance(self, Inventory):
             self.make_grid(map_bg, 7,6)
@@ -754,16 +754,80 @@ class Traveling(State):
         self.Event = Event(self.game)
         self.draw_PiloteUI()
         print('Traveling')
-        self.selectEvent()
-        print(self.Event.number)
+
+        
+    def display_event(self,surface):
+        assets_dir = ressource_path()
+        surface.image.fill("black")
+        font = pg.font.Font(os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'), 14)
+        blit_text(surface.image, self.Event.description, surface.rect.topleft, font, color=pg.Color('white'))
+        self.all_buttons.add(surface)
+        #print("Hello ?")
         
     def update(self):
         super().update()
+        if self.Event.number == 0:
+            diceroll = random.randrange(0,199000)+1000
+            #print("dice roll",diceroll)
+            #print("timer", pg.time.get_ticks() - self.Event.LastEvent)
+            if diceroll <= (pg.time.get_ticks() - self.Event.LastEvent):
+                self.selectEvent()
+                self.menu_drawn = False
 
-    def selectEvent(self):
-        self.Event.number = random.randint(1,EventCount)
+        assets_dir = ressource_path()
+        
+       # check which menu is currently display
+        if self.menu_drawn == False:
+            print(self.menu_drawn)
+            title_button = TextSprite(self.game,
+                    os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                    self.game.memory.Player["System"].name, 12, color = (255,255,255))
+                    #self.game.memory.Player["System"].name + "-->" + self.game.memory.Player["Destination"].name, 12, color = (255,255,255))
+            size = (SCREEN_WIDTH*0.4*0.9,title_button.rect.h)
+            title_button.make_button(size)
+            title_button.rect.centerx = 0.75*SCREEN_WIDTH
+            title_button.rect.top = 0.15*SCREEN_HEIGHT
+            self.all_buttons.add(title_button)     
+            
+            self.button_pos = 0
+            if self.Event.number != 0:
+                for key,value in self.Event.choice.items():
+                    button = TextSprite(self.game,
+                        os.path.join(assets_dir, 'fonts', 'PressStart2P-Regular.ttf'),
+                        key, 12, color = (255,255,255),tag=value)
+                    button.make_button(size)
+                    button.rect.center = title_button.rect.center
+                    button.rect.centery += (0.175+0.150*self.button_pos)*SCREEN_HEIGHT
+                    self.all_buttons.add(button)
+                    self.button_pos += 1
+
+            self.menu_drawn = True
+            
+       # check if any key is pressed
+        if self.game.input.is_mouse_pressed(1):
+            print("Mouse press")
+            mouse_pos = pg.mouse.get_pos()
+            # Check if the mouse click is within the region of Option 1
+            for button in self.all_buttons:
+                for key, value in self.Event.choice.items():
+                    if button.rect.collidepoint(mouse_pos) and button.tag == value:
+                        self.Event.reference = value
+                        self.menu_drawn = False
+                        self.all_buttons.empty()
+                        self.selectEvent()
+                        print(value)
+           
+            
+    def selectEvent(self,event = ""):
+        if event == "":
+            self.Event.number = random.randint(1,EventCount)
+        
         self.Event.load_event()
         print(self.Event.description)
+        print("What ?")
+        for sprite in self.all_sprites:
+           if sprite.tag == "map":
+               self.display_event(sprite)
     
 class Inventory(State):
     """
