@@ -820,7 +820,7 @@ class Traveling(State):
             
     def selectEvent(self,event = ""):
         if event == "":
-            self.Event.number = random.randint(1,EventCount)
+            self.Event.number = random.randint(1,self.Event.Count)
         
         self.Event.load_event()
         print(self.Event.description)
