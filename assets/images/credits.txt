@@ -1,1 +1,9 @@
-start_screen_bg https://dinvstudio.itch.io/dynamic-space-background-lite-free?download
+Image credits:
+--------------
+
+/sprite_sheet/inventory.png 		Beast Pixels
+/start_screen/ (all)			DinV Studio
+/UI/ (all the blue UI elements)		Craftpix
+(all planets and asteroid)		Deep-Fold
+Player_sprite.png			Craftpix
+/UI/ (square_A.png and square_I.png)	Wenrexa
