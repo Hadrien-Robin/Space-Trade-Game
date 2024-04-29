@@ -134,7 +134,44 @@ class TextSprite(pg.sprite.Sprite):
         self.image.set_colorkey((0,0,0))
         self.rect = button_bg.image.get_rect()
         
+class MapSprite(CustomSprite):
+    def __init__(self, game, map_bg):
+        super().__init__()
+        self.game = game
+        self.rect = map_bg.rect.copy()
+        self.rect.h = map_bg.rect.w
+        self.draw_map()
+        self.tag = "map overlay"
 
+    def draw_map(self):
+        surface = pg.Surface(self.rect.size, pg.SRCALPHA)
+        camera_pos = self.game.memory.Galaxy.camera_pos
+        starSprite = TextSprite(self.game, os.path.join(ressource_path(), 'fonts', 'PressStart2P-Regular.ttf'), "*", 10, color = (255,255,255))
+        CurStarSprite = TextSprite(self.game, os.path.join(ressource_path(), 'fonts', 'PressStart2P-Regular.ttf'), "[*]", 10, color = (255,255,255))
+
+        ind = 0
+        self.game.memory.Galaxy.select_visible_star()
+        PrevStars = []
+        print(self.game.memory.Galaxy.visible_stars)
+        for star in self.game.memory.Galaxy.stars.values():
+            if self.game.memory.Galaxy.visible_stars[ind]:
+                pos = [(star.coordinates[0] - self.game.memory.Galaxy.camera_pos[0])*(self.rect.w/self.game.memory.Galaxy.current_zoom), (star.coordinates[1] - self.game.memory.Galaxy.camera_pos[1])*(self.rect.w/self.game.memory.Galaxy.current_zoom)]
+                if star != self.game.memory.Player["System"]:
+                    printpos = [pos[0] - starSprite.rect.w/2, pos[1] - starSprite.rect.h/2]
+                    surface.blit(starSprite.image, printpos, special_flags=pg.BLEND_PREMULTIPLIED)
+                else:
+                    printpos = [pos[0] - CurStarSprite.rect.w/2, pos[1] - CurStarSprite.rect.h/2]
+                    surface.blit(CurStarSprite.image, printpos, special_flags=pg.BLEND_PREMULTIPLIED)
+                PrevStars.append(star)
+                for i in range(0, ind):
+                    if self.game.memory.Galaxy.vs_way[ind][i]:
+                        pos2 = [(PrevStars[i].coordinates[0] - self.game.memory.Galaxy.camera_pos[0])*(self.rect.w/self.game.memory.Galaxy.current_zoom), (PrevStars[i].coordinates[1] - self.game.memory.Galaxy.camera_pos[1])*(self.rect.w/self.game.memory.Galaxy.current_zoom)]
+                        #pg.draw.line(surface, "White", pos,pos2)
+                        draw_dashed_line(surface, "White", pos, pos2, 0)
+            ind += 1
+
+        self.image = surface
+        
     
 
 
@@ -260,4 +297,34 @@ def blit_text(surface, text, pos, font, color=pg.Color('white')):
             x += word_width + space
         x = pos[0]
         y += word_height*1.1
-    
+ 
+
+#Adapted from Rabbid76 @ StackOverflow
+def draw_dashed_line(surf, color, p1, p2, prev_line_len, dash_length=8):
+    dx, dy = p2[0]-p1[0], p2[1]-p1[1]
+    if dx == 0 and dy == 0:
+        return 
+    dist = math.hypot(dx, dy)
+    dx /= dist
+    dy /= dist
+
+    step = dash_length*2
+    start = (int(prev_line_len) // step) * step
+    end = (int(prev_line_len + dist) // step + 1) * step
+    for i in range(start, end, dash_length*2):
+        s = max(0, start - prev_line_len + i)
+        e = min(start - prev_line_len + dash_length + i, dist)
+        if s < e:
+            ps = p1[0] + dx * s, p1[1] + dy * s 
+            pe = p1[0] + dx * e, p1[1] + dy * e 
+            pg.draw.line(surf, color, pe, ps)
+
+
+def draw_dashed_lines(surf, color, points, dash_length=8):
+    p1, p2 = points[0], points[1]
+    line_len = 0
+    dist = dash_length*2
+    while line_len < math.hypot(points[0][0] - points[1][0],points[0][1]-points[1][1]):
+        print(math.hypot(p1[0] - p2[0],p1[1]-p2[1]), line_len)
+        draw_dashed_line(surf, color, p1, p2, line_len, dash_length)
+        line_len += dist
