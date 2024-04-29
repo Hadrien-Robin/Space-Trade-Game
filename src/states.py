@@ -93,7 +93,9 @@ class State:
             if self.menu_state == "build":
                 self.draw_surface_content(map_bg)
         else:
+            mapSprite = MapSprite(self.game, map_bg)
             self.all_sprites.add(map_bg)
+            self.all_sprites.add(mapSprite)
         self.all_frames.add(map_bg.generate_frame())
 
 
