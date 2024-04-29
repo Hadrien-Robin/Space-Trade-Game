@@ -32,7 +32,7 @@ class Galaxy:
         print(self.stars)
         this_one = list(self.stars.keys())[0]
         self.stars[this_one].explore()
-        
+        self.initiate_camera()
 
     def generate(self):
         ALPHA = 1       #this control the distance impact on the probabily of having a pathway between two stars.
@@ -121,7 +121,62 @@ class Galaxy:
 
             for row in self.way:
                 print(row)
+                
+    def initiate_camera(self):
+        self.zoom_level = {1:self.size, 2:(self.size+1)/2, 3:1}
+        self.current_zoom = self.size
+        self.camera_pos = [0,0]
+    
+    def move_camera(self,direction):
+        match direction:
+            case "right":            
+                self.camera_pos = self.camera_pos + [0.05,0]*self.current_zoom
+                if self.camera_pos[1] > self.size - self.current_zoom:
+                    self.camera_pos = self.size - self.current_zoom
+            case "left":
+                self.camera_pos = self.camera_pos - [0.05,0]*self.current_zoom
+                if self.camera_pos[1] < 0:
+                    self.camera_pos = 0
+            case "down":
+                self.camera_pos = self.camera_pos - [0,0.05]*self.current_zoom
+                if self.camera_pos[0] < 0:
+                    self.camera_pos = 0
+            case "up":
+                self.camera_pos = self.camera_pos + [0,0.05]*self.current_zoom
+                if self.camera_pos[0] > self.size - self.current_zoom:
+                    self.camera_pos = self.size - self.current_zoom
+            case "zoom":
+                for key,value in self.current_zoom.items():
+                    if value == 1:
+                        self.current_zoom = self.zoom_level[1]
+                        break
+                    elif value == self.current_zoom:
+                        self.current_zoom = self.zoom_level[key+1]
+                        break
+            
+    def select_visible_star(self):
+        minX = self.camera_pos[0] 
+        maxX = self.camera_pos[0] + self.current_zoom
+            
+        minY = self.camera_pos[1]
+        maxY = self.camera_pos[1] + self.current_zoom
+        
+        self.visible_stars = [False for i in range(len(self.stars))]
+        self.vs_way = [[False for i in range(len(self.stars))] for j in range(len(self.stars))]
+        ind = 0
+        for star in self.stars.values():
+            x,y = star.coordinates
+            if minX <= x <= maxX and minY <= y <= maxY:
+                self.visible_stars[ind] = True
+                for i in range(0, ind):
+                    if self.visible_stars[i] and self.way[ind][i]:
+                        self.vs_way[ind][i] = True
+            ind += 1
 
+        print("len(visible_stars)",len(self.visible_stars))
+        
+
+        return self.visible_stars
     
 class Star:
     """
@@ -163,25 +218,6 @@ class Star:
                 self.objects.append(System_object(self,"icy giant"))
 
         print("populated with ",len(self.objects), " object(s).")
-
-class System_object:
-    """
-    System objects class
-    """
-
-    def __init__(self,star,obj_type):
-        self.type = obj_type
-        self.name = star.name
-        LETTER_NAME = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o']
-        self.grid = []
-        if obj_type != "asteroid belt":
-            self.name += ' ' + LETTER_NAME[len(star.objects) - sum(1 for Ob in star.objects if Ob.type == "asteroid belt") + 1]
-        else:
-            self.name = star.name +"'s asteroid belt"
-            for it in star.objects:
-                if it.name == "asteroid belt":
-                    self.name += " II"
-        print("Generated a(n) ",self.type, " named ", self.name)
         
 class System_object:
     """
@@ -302,6 +338,4 @@ class Square:
         self.ressource = -1
         
         self.position = pos
-        
-
-        
+   
